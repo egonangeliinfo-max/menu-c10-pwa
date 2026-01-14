@@ -1,6 +1,5 @@
 const WORKER_URL = "https://menu-push-c10.egon-angeli-info.workers.dev";
-const VAPID_PUBLIC_KEY = "BNjswK7hjXgdXlviYKHKOaqVQaG0Wsg1w6oIT9h8c-FrMDFqHrWh8QZonpM6VUjPW8az-fwq4Pd0uzANpq4KAGo
-";
+const VAPID_PUBLIC_KEY = "BNjswK7hjXgdXlviYKHKOaqVQaG0Wsg1w6oIT9h8c-FrMDFqHrWh8QZonpM6VUjPW8az-fwq4Pd0uzANpq4KAGo";
 const SOURCE_ID = "c10";
 
 const out = document.getElementById("out");
