@@ -7,6 +7,7 @@ const out = document.getElementById("out");
 const btn = document.getElementById("btn");
 
 btn.onclick = async () => {
+  out.textContent = "CLICK OK";
   try {
     if (!("serviceWorker" in navigator)) throw new Error("Service Worker non supportato");
     if (!("PushManager" in window)) throw new Error("Push non supportato");
