@@ -4,6 +4,8 @@ const SOURCE_ID = "c10";
 
 const out = document.getElementById("out");
 const btn = document.getElementById("btn");
+out.textContent = "APP LOADED ✅";
+console.log("APP LOADED");
 
 btn.onclick = async () => {
   out.textContent = "CLICK OK";
