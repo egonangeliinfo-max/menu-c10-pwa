@@ -28,33 +28,67 @@
     </div>
   </div>
 
-  <script>
+<script>
+  const WORKER_URL = "https://menu-push-c10.egon-angeli-info.workers.dev";
+
+  async function loadMenu() {
     const params = new URLSearchParams(location.search);
 
-    const date = params.get("date") || "Oggi";
-    const dishesRaw = params.get("dishes") || "[]";
-    const source = params.get("source") || "https://menuscuole.risto3cloud.it/menu";
+    let date = params.get("date");
+    let dishes: string[] | any = null;
+    let source = params.get("source") || "https://menuscuole.risto3cloud.it/menu";
 
-    let dishes = [];
-    try { dishes = JSON.parse(dishesRaw); } catch {}
+    const dishesRaw = params.get("dishes");
+
+    if (dishesRaw) {
+      // Caso: arrivo da notifica (parametri completi)
+      try {
+        dishes = JSON.parse(dishesRaw);
+      } catch {
+        dishes = [];
+      }
+    } else {
+      // Caso: apertura "manuale" (nessun parametro) → chiedo al Worker il menu di oggi
+      try {
+        const res = await fetch(`${WORKER_URL}/menu-today?sourceId=c10`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.ok && json.menu) {
+            date = json.menu.date || date;
+            dishes = json.menu.dishes || [];
+            source = json.menu.source || source;
+          }
+        }
+      } catch (e) {
+        console.error("Errore nel recupero menu-today:", e);
+      }
+    }
+
+    if (!date) date = "Oggi";
+    if (!Array.isArray(dishes)) dishes = [];
 
     document.getElementById("date").textContent = `📅 ${date}`;
 
     const ul = document.getElementById("list");
+    ul.innerHTML = "";
+
     if (!dishes.length) {
       const li = document.createElement("li");
       li.textContent = "Nessun piatto trovato";
       ul.appendChild(li);
     } else {
-      dishes.forEach(d => {
+      dishes.forEach((d: any) => {
         const li = document.createElement("li");
-        li.textContent = `• ${d}`;
+        li.textContent = `• ${String(d)}`;
         ul.appendChild(li);
       });
     }
 
-    // bottone "Apri sito ufficiale"
     document.getElementById("openSrc").href = source;
-  </script>
+  }
+
+  loadMenu();
+</script>
+
 </body>
 </html>
