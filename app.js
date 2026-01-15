@@ -4,11 +4,11 @@ const SOURCE_ID = "c10";
 
 const out = document.getElementById("out");
 const btn = document.getElementById("btn");
-out.textContent = "APP LOADED ✅";
-console.log("APP LOADED");
+//out.textContent = "APP LOADED ✅";
+//console.log("APP LOADED");
 
 btn.onclick = async () => {
-  out.textContent = "CLICK OK";
+  //out.textContent = "CLICK OK";
   try {
     if (!("serviceWorker" in navigator)) throw new Error("Service Worker non supportato");
     if (!("PushManager" in window)) throw new Error("Push non supportato");
