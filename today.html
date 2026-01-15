@@ -11,32 +11,27 @@
     .sub{color:#555;margin:0 0 10px}
     ul{margin:10px 0 14px;padding-left:18px}
     li{margin:4px 0}
-    .footer{font-size:13px;color:#666;border-top:1px dashed #ddd;padding-top:10px}
-    a{color:inherit}
     .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .btn{display:inline-block;padding:10px 12px;border:1px solid #ccc;border-radius:12px;text-decoration:none}
+    .btn{display:inline-block;padding:10px 12px;border:1px solid #ccc;border-radius:12px;text-decoration:none;color:inherit}
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>🍽️ Menu scuola – Comunità Vallagarina (C10)</h1>
+    <h1>🍽️ Menu scuola – C10</h1>
     <p class="sub" id="date">📅 …</p>
 
     <ul id="list"></ul>
 
-    <div class="footer">
-      <div><strong>Fonte:</strong> <a id="src" href="#" target="_blank" rel="noopener">apri</a></div>
-      <div class="btnrow">
-        <a class="btn" id="openSrc" href="#" target="_blank" rel="noopener">Apri sito ufficiale</a>
-        <a class="btn" href="./">Torna alla home</a>
-      </div>
+    <div class="btnrow">
+      <a class="btn" id="openSrc" href="#" target="_blank" rel="noopener">Apri sito ufficiale</a>
+      <a class="btn" href="./">Torna alla home</a>
     </div>
   </div>
 
   <script>
     const params = new URLSearchParams(location.search);
 
-    const date = params.get("date") || "—";
+    const date = params.get("date") || "Oggi";
     const dishesRaw = params.get("dishes") || "[]";
     const source = params.get("source") || "https://menuscuole.risto3cloud.it/menu";
 
@@ -58,11 +53,8 @@
       });
     }
 
-    const a = document.getElementById("src");
-    const a2 = document.getElementById("openSrc");
-    a.href = source;
-    a.textContent = source;
-    a2.href = source;
+    // bottone "Apri sito ufficiale"
+    document.getElementById("openSrc").href = source;
   </script>
 </body>
 </html>
