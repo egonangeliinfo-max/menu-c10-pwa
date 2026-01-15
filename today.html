@@ -35,22 +35,22 @@
     const params = new URLSearchParams(location.search);
 
     let date = params.get("date");
-    let dishes: string[] | any = null;
+    let dishes = null;
     let source = params.get("source") || "https://menuscuole.risto3cloud.it/menu";
-
     const dishesRaw = params.get("dishes");
 
     if (dishesRaw) {
-      // Caso: arrivo da notifica (parametri completi)
+      // Caso: arrivo da notifica (con parametri)
       try {
         dishes = JSON.parse(dishesRaw);
-      } catch {
+      } catch (e) {
+        console.error("Errore parse dishes dalla query:", e);
         dishes = [];
       }
     } else {
-      // Caso: apertura "manuale" (nessun parametro) → chiedo al Worker il menu di oggi
+      // Caso: apertura manuale → chiedi al Worker il menu di oggi
       try {
-        const res = await fetch(`${WORKER_URL}/menu-today?sourceId=c10`);
+        const res = await fetch(WORKER_URL + "/menu-today?sourceId=c10");
         if (res.ok) {
           const json = await res.json();
           if (json.ok && json.menu) {
@@ -58,6 +58,8 @@
             dishes = json.menu.dishes || [];
             source = json.menu.source || source;
           }
+        } else {
+          console.warn("menu-today non disponibile:", res.status);
         }
       } catch (e) {
         console.error("Errore nel recupero menu-today:", e);
@@ -67,28 +69,39 @@
     if (!date) date = "Oggi";
     if (!Array.isArray(dishes)) dishes = [];
 
-    document.getElementById("date").textContent = `📅 ${date}`;
-
-    const ul = document.getElementById("list");
-    ul.innerHTML = "";
-
-    if (!dishes.length) {
-      const li = document.createElement("li");
-      li.textContent = "Nessun piatto trovato";
-      ul.appendChild(li);
-    } else {
-      dishes.forEach((d: any) => {
-        const li = document.createElement("li");
-        li.textContent = `• ${String(d)}`;
-        ul.appendChild(li);
-      });
+    // Aggiorna data
+    const dateEl = document.getElementById("date");
+    if (dateEl) {
+      dateEl.textContent = "📅 " + date;
     }
 
-    document.getElementById("openSrc").href = source;
+    // Aggiorna lista piatti
+    const ul = document.getElementById("list");
+    if (ul) {
+      ul.innerHTML = "";
+      if (!dishes.length) {
+        const li = document.createElement("li");
+        li.textContent = "Nessun piatto trovato";
+        ul.appendChild(li);
+      } else {
+        dishes.forEach((d) => {
+          const li = document.createElement("li");
+          li.textContent = "• " + String(d);
+          ul.appendChild(li);
+        });
+      }
+    }
+
+    // Aggiorna link "Apri sito ufficiale"
+    const open = document.getElementById("openSrc");
+    if (open) {
+      open.href = source;
+    }
   }
 
   loadMenu();
 </script>
+
 
 </body>
 </html>
