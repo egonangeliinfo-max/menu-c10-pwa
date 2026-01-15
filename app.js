@@ -6,30 +6,50 @@ function getOutEl() {
   return document.getElementById("out");
 }
 
-// Espone la funzione che index.html chiama dopo aver ottenuto il permesso
+// Registriamo il service worker SUBITO e aspettiamo che sia "ready"
+const swReadyPromise = (async () => {
+  if (!("serviceWorker" in navigator)) {
+    const out = getOutEl();
+    if (out) out.textContent = "Service Worker non supportato.";
+    return null;
+  }
+
+  try {
+    // Registra (se già registrato, lo riusa)
+    await navigator.serviceWorker.register("./sw.js");
+    // Aspetta che diventi "active"
+    const readyReg = await navigator.serviceWorker.ready;
+    const out = getOutEl();
+    if (out) out.textContent = "Service Worker pronto ✅";
+    return readyReg;
+  } catch (e) {
+    const out = getOutEl();
+    if (out) out.textContent = "Errore SW: " + String(e);
+    return null;
+  }
+})();
+
+// Funzione che index.html chiamerà dopo il permesso notifiche
 window.enablePush = async function enablePush() {
   const out = getOutEl();
 
   try {
     if (!("serviceWorker" in navigator)) throw new Error("Service Worker non supportato");
     if (!("PushManager" in window)) throw new Error("Push non supportato");
-
-    // registra SW (se già registrato, lo riusa)
-    const reg = await navigator.serviceWorker.register("./sw.js");
-
-    // qui il permesso è già granted (lo chiede index.html), ma facciamo un check
     if (!("Notification" in window)) throw new Error("Notification API non supportata");
     if (Notification.permission !== "granted") {
       throw new Error("Permesso notifiche non concesso");
     }
 
-    // subscribe push
+    // Aspetta che il service worker sia attivo (fix InvalidStateError su iOS)
+    const reg = await swReadyPromise;
+    if (!reg) throw new Error("Service Worker non pronto.");
+
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
     });
 
-    // invio al Worker
     const res = await fetch(`${WORKER_URL}/subscribe`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -46,7 +66,7 @@ window.enablePush = async function enablePush() {
       throw new Error(`Subscribe failed: ${res.status} ${JSON.stringify(json)}`);
     }
 
-    return json; // utile per debug
+    return json;
   } catch (e) {
     if (out) out.textContent = String(e);
     throw e;
