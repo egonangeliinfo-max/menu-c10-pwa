@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Menu scuola – C10</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:16px;line-height:1.35}
+    .card{max-width:720px;margin:0 auto;border:1px solid #e6e6e6;border-radius:14px;padding:14px 14px 10px}
+    h1{font-size:18px;margin:0 0 6px}
+    .sub{color:#555;margin:0 0 10px}
+    ul{margin:10px 0 14px;padding-left:18px}
+    li{margin:4px 0}
+    .footer{font-size:13px;color:#666;border-top:1px dashed #ddd;padding-top:10px}
+    a{color:inherit}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .btn{display:inline-block;padding:10px 12px;border:1px solid #ccc;border-radius:12px;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🍽️ Menu scuola – Comunità Vallagarina (C10)</h1>
+    <p class="sub" id="date">📅 …</p>
+
+    <ul id="list"></ul>
+
+    <div class="footer">
+      <div><strong>Fonte:</strong> <a id="src" href="#" target="_blank" rel="noopener">apri</a></div>
+      <div class="btnrow">
+        <a class="btn" id="openSrc" href="#" target="_blank" rel="noopener">Apri sito ufficiale</a>
+        <a class="btn" href="./">Torna alla home</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+
+    const date = params.get("date") || "—";
+    const dishesRaw = params.get("dishes") || "[]";
+    const source = params.get("source") || "https://menuscuole.risto3cloud.it/menu";
+
+    let dishes = [];
+    try { dishes = JSON.parse(dishesRaw); } catch {}
+
+    document.getElementById("date").textContent = `📅 ${date}`;
+
+    const ul = document.getElementById("list");
+    if (!dishes.length) {
+      const li = document.createElement("li");
+      li.textContent = "Nessun piatto trovato";
+      ul.appendChild(li);
+    } else {
+      dishes.forEach(d => {
+        const li = document.createElement("li");
+        li.textContent = `• ${d}`;
+        ul.appendChild(li);
+      });
+    }
+
+    const a = document.getElementById("src");
+    const a2 = document.getElementById("openSrc");
+    a.href = source;
+    a.textContent = source;
+    a2.href = source;
+  </script>
+</body>
+</html>
