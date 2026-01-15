@@ -32,5 +32,121 @@
 </button>
 
   <script src="./app.js"></script>
+  <script>
+  // ----- helpers -----
+  function isIOS() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+  }
+
+  function isStandalone() {
+    // iOS: navigator.standalone (vecchio) + display-mode standalone (moderno)
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+
+  function canUsePush() {
+    // Push via Service Worker
+    return ("serviceWorker" in navigator) && ("PushManager" in window) && ("Notification" in window);
+  }
+
+  function setStatus(msg) {
+    const el = document.getElementById("push-status");
+    if (el) el.textContent = msg || "";
+  }
+
+  function show(elId, yes) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.style.display = yes ? "block" : "none";
+  }
+
+  function setBtnEnabled(enabled, label) {
+    const btn = document.getElementById("btn-enable");
+    if (!btn) return;
+    btn.disabled = !enabled;
+    btn.style.opacity = enabled ? "1" : "0.55";
+    btn.style.cursor = enabled ? "pointer" : "not-allowed";
+    if (label) btn.textContent = label;
+  }
+
+  // ----- UI state machine -----
+  function refreshPushUI() {
+    const ios = isIOS();
+    const standalone = isStandalone();
+    const pushOk = canUsePush();
+
+    // Caso iPhone/iPad NON installata: mostra istruzioni, disabilita bottone
+    if (ios && !standalone) {
+      show("ios-help", true);
+      setStatus("Su iPhone le notifiche funzionano solo dopo l’installazione sulla Home.");
+      setBtnEnabled(false, "Installa l’app per le notifiche");
+      return;
+    }
+
+    // Se è iOS installata oppure non iOS:
+    show("ios-help", false);
+
+    // Se push non supportato (device/browser): disabilita
+    if (!pushOk) {
+      setStatus("ERROR: push non supportato su questo dispositivo/browser.");
+      setBtnEnabled(false, "Push non supportato");
+      return;
+    }
+
+    // Push supportato: abilita e mostra stato permesso
+    if (Notification.permission === "granted") {
+      setStatus("Notifiche già attive ✅");
+      setBtnEnabled(false, "Notifiche attive");
+    } else if (Notification.permission === "denied") {
+      setStatus("Notifiche bloccate (denied). Sbloccale dalle impostazioni del browser.");
+      setBtnEnabled(false, "Notifiche bloccate");
+    } else {
+      setStatus("Premi “Attiva notifiche” per ricevere il menu ogni mattina.");
+      setBtnEnabled(true, "Attiva notifiche");
+    }
+  }
+
+  // ----- click handler (qui chiamerai la tua funzione reale di subscribe) -----
+  async function onEnableClick() {
+    // doppio check di sicurezza
+    if (isIOS() && !isStandalone()) {
+      alert("Su iPhone le notifiche funzionano solo se l’app è installata.\nCondividi → Aggiungi alla schermata Home.");
+      return;
+    }
+    if (!canUsePush()) {
+      alert("Push non supportato su questo dispositivo/browser.");
+      return;
+    }
+
+    // 1) chiedi permesso
+    const perm = await Notification.requestPermission();
+    refreshPushUI();
+    if (perm !== "granted") return;
+
+    // 2) qui inserisci la tua logica di subscribe esistente
+    //    (service worker registration + pushManager.subscribe + POST /subscribe)
+    //    ESEMPIO: se hai già una funzione enablePush() usala:
+    if (typeof window.enablePush === "function") {
+      await window.enablePush();
+      setStatus("Notifiche attivate ✅");
+      setBtnEnabled(false, "Notifiche attive");
+    } else {
+      // se non hai una funzione globale, almeno segnala:
+      setStatus("Permesso concesso ✅ (manca la funzione enablePush nel codice).");
+    }
+  }
+
+  // ----- boot -----
+  window.addEventListener("load", () => {
+    console.log("APP LOADED ✅");
+    refreshPushUI();
+
+    const btn = document.getElementById("btn-enable");
+    if (btn) btn.addEventListener("click", onEnableClick);
+
+    // su iOS, dopo "Add to Home Screen" spesso cambia display-mode: ricalcola
+    document.addEventListener("visibilitychange", refreshPushUI);
+  });
+</script>
+
 </body>
 </html>
