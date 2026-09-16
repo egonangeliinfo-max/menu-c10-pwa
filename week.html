@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cene della settimana – C10</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      margin: 0;
+      padding: 16px;
+      line-height: 1.4;
+      background: #f6f6f6;
+      color: #222;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: 21px;
+      margin: 0 0 6px;
+    }
+
+    .week {
+      color: #555;
+      margin: 0;
+    }
+
+    .day {
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 16px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .day-title {
+      font-weight: 700;
+      font-size: 17px;
+      padding: 13px 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .lunch {
+      padding: 13px 15px;
+      background: #fafafa;
+    }
+
+    .section-title {
+      font-weight: 650;
+      margin-bottom: 6px;
+    }
+
+    .lunch ul {
+      margin: 5px 0 0;
+      padding-left: 20px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .lunch li {
+      margin: 2px 0;
+    }
+
+    .dinner {
+      padding: 15px;
+    }
+
+    .dinner-name {
+      font-size: 18px;
+      font-weight: 750;
+      margin: 5px 0 8px;
+    }
+
+    .details {
+      color: #555;
+      font-size: 14px;
+    }
+
+    .btnrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 18px 0;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 11px 14px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .status {
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="header">
+      <h1>🍽️ Cene della settimana</h1>
+      <p class="week" id="weekLabel">📅 Caricamento...</p>
+    </div>
+
+    <div id="content">
+      <div class="status">
+        Caricamento del piano settimanale...
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <a class="btn" href="./">🏠 Torna alla home</a>
+
+      <a
+        class="btn"
+        href="https://menuscuole.risto3cloud.it/menu"
+        target="_blank"
+        rel="noopener"
+      >
+        🏫 Menu Risto3
+      </a>
+    </div>
+
+  </div>
+
+<script>
+
+const WORKER_URL =
+  "https://menu-push-c10.egon-angeli-info.workers.dev";
+
+function formatWeek(days) {
+  if (!days || !days.length) {
+    return "Settimana";
+  }
+
+  const first = days[0].date || "";
+  const last = days[days.length - 1].date || "";
+
+  const firstMatch =
+    first.match(/(\d{1,2})\s+([a-zàèéìòù]+)\s+(\d{4})/i);
+
+  const lastMatch =
+    last.match(/(\d{1,2})\s+([a-zàèéìòù]+)\s+(\d{4})/i);
+
+  if (!firstMatch || !lastMatch) {
+    return first + " – " + last;
+  }
+
+  const firstDay = firstMatch[1];
+  const firstMonth = firstMatch[2];
+
+  const lastDay = lastMatch[1];
+  const lastMonth = lastMatch[2];
+  const year = lastMatch[3];
+
+  if (
+    firstMonth.toLowerCase() ===
+    lastMonth.toLowerCase()
+  ) {
+    return `${firstDay}–${lastDay} ${lastMonth} ${year}`;
+  }
+
+  return `${firstDay} ${firstMonth} – ${lastDay} ${lastMonth} ${year}`;
+}
+
+
+function createDayCard(day) {
+
+  const card =
+    document.createElement("div");
+
+  card.className = "day";
+
+
+  /* DATA */
+
+  const title =
+    document.createElement("div");
+
+  title.className = "day-title";
+  title.textContent =
+    day.date || "Giornata";
+
+  card.appendChild(title);
+
+
+  /* PRANZO */
+
+  const lunch =
+    document.createElement("div");
+
+  lunch.className = "lunch";
+
+
+  const lunchTitle =
+    document.createElement("div");
+
+  lunchTitle.className =
+    "section-title";
+
+  lunchTitle.textContent =
+    "🏫 Pranzo a scuola";
+
+  lunch.appendChild(lunchTitle);
+
+
+  const ul =
+    document.createElement("ul");
+
+  const dishes =
+    day.lunch?.dishes || [];
+
+  if (!dishes.length) {
+
+    const li =
+      document.createElement("li");
+
+    li.textContent =
+      "Menu non disponibile";
+
+    ul.appendChild(li);
+
+  } else {
+
+    dishes.forEach((dish) => {
+
+      const li =
+        document.createElement("li");
+
+      li.textContent =
+        String(dish);
+
+      ul.appendChild(li);
+
+    });
+
+  }
+
+  lunch.appendChild(ul);
+
+  card.appendChild(lunch);
+
+
+  /* CENA */
+
+  const dinner =
+    document.createElement("div");
+
+  dinner.className = "dinner";
+
+
+  const dinnerTitle =
+    document.createElement("div");
+
+  dinnerTitle.className =
+    "section-title";
+
+  dinnerTitle.textContent =
+    "🌙 Cena consigliata";
+
+  dinner.appendChild(dinnerTitle);
+
+
+  const dinnerName =
+    document.createElement("div");
+
+  dinnerName.className =
+    "dinner-name";
+
+  dinnerName.textContent =
+    day.dinner?.name ||
+    "Cena non disponibile";
+
+  dinner.appendChild(dinnerName);
+
+
+  if (day.dinner) {
+
+    const details =
+      document.createElement("div");
+
+    details.className =
+      "details";
+
+    const parts = [];
+
+    if (day.dinner.minutes) {
+      parts.push(
+        `⏱️ ${day.dinner.minutes} min`
+      );
+    }
+
+    if (day.dinner.protein) {
+
+      const protein =
+        String(day.dinner.protein)
+          .replaceAll("_", " ");
+
+      parts.push(
+        `🥗 ${protein}`
+      );
+    }
+
+    details.textContent =
+      parts.join(" · ");
+
+    dinner.appendChild(details);
+  }
+
+
+  card.appendChild(dinner);
+
+  return card;
+}
+
+
+async function loadWeek() {
+
+  const content =
+    document.getElementById("content");
+
+  const weekLabel =
+    document.getElementById("weekLabel");
+
+  try {
+
+    const response =
+      await fetch(
+        WORKER_URL +
+        "/weekly-plan?sourceId=c10"
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "Piano settimanale non disponibile"
+      );
+    }
+
+    const json =
+      await response.json();
+
+    if (
+      !json.ok ||
+      !json.plan ||
+      !Array.isArray(json.plan.days)
+    ) {
+      throw new Error(
+        "Dati settimanali non validi"
+      );
+    }
+
+    const plan =
+      json.plan;
+
+
+    weekLabel.textContent =
+      "📅 " +
+      formatWeek(plan.days);
+
+
+    content.innerHTML = "";
+
+
+    plan.days.forEach((day) => {
+
+      content.appendChild(
+        createDayCard(day)
+      );
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    content.innerHTML = "";
+
+    const status =
+      document.createElement("div");
+
+    status.className =
+      "status";
+
+    status.textContent =
+      "Il piano delle cene non è ancora disponibile.";
+
+    content.appendChild(status);
+
+    weekLabel.textContent =
+      "📅 Settimana non disponibile";
+  }
+}
+
+
+loadWeek();
+
+</script>
+
+</body>
+</html>
