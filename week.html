@@ -176,6 +176,14 @@
   text-decoration: line-through;
   color: #888;
 }
+    .shopping-note {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 4px 0 16px;
+  font-size: 14px;
+  line-height: 1.4;
+}
   </style>
 </head>
 
@@ -492,7 +500,18 @@ function renderShoppingList(shoppingList) {
   if (!container) return;
 
   container.innerHTML = "";
+const note =
+  document.createElement("div");
 
+note.className = "shopping-note";
+
+note.innerHTML = `
+  👨‍👩‍👧‍👦 <strong>Quantità calcolate per 4 persone.</strong><br>
+  Puoi aumentare o ridurre le quantità in proporzione
+  al numero di persone.
+`;
+
+container.appendChild(note);
   const normalized =
     normalizeShoppingList(shoppingList);
 
