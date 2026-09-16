@@ -3,155 +3,595 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Menu scuola C10</title>
+
   <link rel="manifest" href="./manifest.json">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: #f6f6f6;
+      color: #222;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 4px 0 6px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0 0 22px;
+      color: #666;
+      line-height: 1.45;
+    }
+
+    .menu-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .menu-card {
+      display: block;
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 16px;
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .menu-card:active {
+      transform: scale(0.99);
+    }
+
+    .menu-title {
+      font-size: 18px;
+      font-weight: 750;
+      margin-bottom: 4px;
+    }
+
+    .menu-description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .notifications {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 18px;
+    }
+
+    .notifications h2 {
+      font-size: 18px;
+      margin: 0 0 6px;
+    }
+
+    .notifications p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    #ios-help {
+      display: none;
+      padding: 12px;
+      border: 1px solid #e6e6e6;
+      border-radius: 14px;
+      margin: 12px 0;
+      background: #fafafa;
+    }
+
+    #push-status {
+      margin: 12px 0;
+      color: #555;
+      font-size: 14px;
+    }
+
+    #btn-enable {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background: #fff;
+      font: inherit;
+      font-weight: 650;
+    }
+
+    #out {
+      white-space: pre-wrap;
+      font-size: 12px;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Menu scuola C10</h1>
-  <p>Installa e attiva le notifiche per ricevere il menu ogni mattina.</p>
 
-  <!-- ✅ NUOVO: link per aprire il menu di oggi anche senza notifica -->
-  <p>
-    <a id="link-today"
-       href="./today.html"
-       style="display:inline-block; margin:8px 0 16px; padding:8px 12px; border:1px solid #ccc; border-radius:12px; text-decoration:none; color:inherit;">
-      📅 Vedi il menu di oggi
-    </a>
-  </p>
-  <!-- fine parte nuova -->
+  <main class="container">
 
-  <!-- Istruzioni automatiche per iPhone/iPad non installati -->
-  <div id="ios-help" style="display:none; padding:12px; border:1px solid #e6e6e6; border-radius:14px; margin:12px 0;">
-    <div style="font-weight:700; margin-bottom:6px;">🍎 iPhone/iPad</div>
-    <div style="margin-bottom:10px;">
-      Le notifiche funzionano <b>solo se installi l’app</b> sulla schermata Home.
+    <h1>🍽️ Menu scuola C10</h1>
+
+    <p class="subtitle">
+      Menu scolastico, proposte per le cene
+      e lista della spesa della settimana.
+    </p>
+
+
+    <!-- =========================
+         FUNZIONI PRINCIPALI
+         ========================= -->
+
+    <div class="menu-grid">
+
+      <a
+        class="menu-card"
+        href="./today.html"
+      >
+        <div class="menu-title">
+          📅 Menu di oggi
+        </div>
+
+        <div class="menu-description">
+          Guarda il pranzo previsto oggi a scuola.
+        </div>
+      </a>
+
+
+      <a
+        class="menu-card"
+        href="./week.html"
+      >
+        <div class="menu-title">
+          🍽️ Cene della settimana
+        </div>
+
+        <div class="menu-description">
+          Le cinque cene proposte in base
+          ai pranzi scolastici della settimana.
+        </div>
+      </a>
+
+
+      <a
+        class="menu-card"
+        href="./week.html#spesa"
+      >
+        <div class="menu-title">
+          🛒 Lista della spesa
+        </div>
+
+        <div class="menu-description">
+          Ingredienti aggregati per le cinque cene.
+          Quantità indicative per 4 persone.
+        </div>
+      </a>
+
     </div>
-    <ol style="margin:0; padding-left:18px;">
-      <li>Apri questa pagina in <b>Safari</b></li>
-      <li>Tocca <b>Condividi</b> (icona con quadrato e freccia)</li>
-      <li>Seleziona <b>Aggiungi alla schermata Home</b></li>
-      <li>Apri l’app dall’icona e poi attiva le notifiche</li>
-    </ol>
-  </div>
 
-  <div id="push-status" style="margin:10px 0; color:#555;"></div>
 
-  <button id="btn-enable" style="padding:10px 12px; border:1px solid #ccc; border-radius:12px; background:#fff;">
-    Attiva notifiche
-  </button>
+    <!-- =========================
+         NOTIFICHE
+         ========================= -->
 
-  <pre id="out"></pre>
+    <section class="notifications">
 
-  <!-- app.js deve definire: window.enablePush = async function() { ... } -->
+      <h2>🔔 Notifiche</h2>
+
+      <p>
+        Attivale per ricevere automaticamente
+        il menu e gli aggiornamenti settimanali.
+      </p>
+
+
+      <!-- ISTRUZIONI IPHONE/IPAD -->
+
+      <div id="ios-help">
+
+        <div
+          style="
+            font-weight:700;
+            margin-bottom:6px;
+          "
+        >
+          🍎 iPhone/iPad
+        </div>
+
+        <div style="margin-bottom:10px;">
+          Le notifiche funzionano
+          <b>solo se installi l’app</b>
+          sulla schermata Home.
+        </div>
+
+        <ol
+          style="
+            margin:0;
+            padding-left:18px;
+          "
+        >
+          <li>
+            Apri questa pagina in <b>Safari</b>
+          </li>
+
+          <li>
+            Tocca <b>Condividi</b>
+            (quadrato con freccia)
+          </li>
+
+          <li>
+            Seleziona
+            <b>Aggiungi alla schermata Home</b>
+          </li>
+
+          <li>
+            Apri l’app dall’icona
+            e attiva le notifiche
+          </li>
+        </ol>
+
+      </div>
+
+
+      <div id="push-status"></div>
+
+
+      <button id="btn-enable">
+        Attiva notifiche
+      </button>
+
+    </section>
+
+
+    <pre id="out"></pre>
+
+  </main>
+
+
+  <!-- app.js gestisce la sottoscrizione push -->
   <script src="./app.js"></script>
 
+
   <script>
-    // ----- helpers -----
+
+    /* =========================
+       HELPERS
+       ========================= */
+
     function isIOS() {
-      return /iphone|ipad|ipod/i.test(navigator.userAgent);
+      return /iphone|ipad|ipod/i.test(
+        navigator.userAgent
+      );
     }
+
 
     function isStandalone() {
-      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+      return (
+        window.matchMedia(
+          "(display-mode: standalone)"
+        ).matches
+        ||
+        window.navigator.standalone === true
+      );
     }
+
 
     function canUsePush() {
-      return ("serviceWorker" in navigator) && ("PushManager" in window) && ("Notification" in window);
+      return (
+        ("serviceWorker" in navigator)
+        &&
+        ("PushManager" in window)
+        &&
+        ("Notification" in window)
+      );
     }
+
 
     function setStatus(msg) {
-      const el = document.getElementById("push-status");
-      if (el) el.textContent = msg || "";
+      const el =
+        document.getElementById(
+          "push-status"
+        );
+
+      if (el) {
+        el.textContent = msg || "";
+      }
     }
+
 
     function show(elId, yes) {
-      const el = document.getElementById(elId);
+      const el =
+        document.getElementById(elId);
+
       if (!el) return;
-      el.style.display = yes ? "block" : "none";
+
+      el.style.display =
+        yes ? "block" : "none";
     }
 
-    function setBtnEnabled(enabled, label) {
-      const btn = document.getElementById("btn-enable");
+
+    function setBtnEnabled(
+      enabled,
+      label
+    ) {
+
+      const btn =
+        document.getElementById(
+          "btn-enable"
+        );
+
       if (!btn) return;
+
       btn.disabled = !enabled;
-      btn.style.opacity = enabled ? "1" : "0.55";
-      btn.style.cursor = enabled ? "pointer" : "not-allowed";
-      if (label) btn.textContent = label;
+
+      btn.style.opacity =
+        enabled ? "1" : "0.55";
+
+      btn.style.cursor =
+        enabled
+          ? "pointer"
+          : "not-allowed";
+
+      if (label) {
+        btn.textContent = label;
+      }
     }
 
-    // ----- UI state machine -----
+
+    /* =========================
+       STATO NOTIFICHE
+       ========================= */
+
     function refreshPushUI() {
+
       const ios = isIOS();
-      const standalone = isStandalone();
-      const pushOk = canUsePush();
 
-      // iPhone/iPad NON installata: mostra istruzioni e disabilita bottone
+      const standalone =
+        isStandalone();
+
+      const pushOk =
+        canUsePush();
+
+
+      /*
+       * iPhone/iPad non installato
+       */
+
       if (ios && !standalone) {
-        show("ios-help", true);
-        setStatus("Su iPhone le notifiche funzionano solo dopo l’installazione sulla Home.");
-        setBtnEnabled(false, "Installa l’app per le notifiche");
+
+        show(
+          "ios-help",
+          true
+        );
+
+        setStatus(
+          "Su iPhone le notifiche funzionano solo dopo l’installazione sulla Home."
+        );
+
+        setBtnEnabled(
+          false,
+          "Installa l’app per le notifiche"
+        );
+
         return;
       }
 
-      // iOS installata oppure non iOS
-      show("ios-help", false);
 
-      // Push non supportato
+      /*
+       * iOS installata
+       * oppure altro dispositivo
+       */
+
+      show(
+        "ios-help",
+        false
+      );
+
+
+      /*
+       * Push non supportato
+       */
+
       if (!pushOk) {
-        setStatus("Push non supportato su questo dispositivo/browser.");
-        setBtnEnabled(false, "Push non supportato");
+
+        setStatus(
+          "Push non supportato su questo dispositivo/browser."
+        );
+
+        setBtnEnabled(
+          false,
+          "Push non supportato"
+        );
+
         return;
       }
 
-      // Stato permesso notifiche
-      if (Notification.permission === "granted") {
-        setStatus("Notifiche già attive ✅");
-        setBtnEnabled(false, "Notifiche attive");
-      } else if (Notification.permission === "denied") {
-        setStatus("Notifiche bloccate. Sbloccale dalle impostazioni del browser/app.");
-        setBtnEnabled(false, "Notifiche bloccate");
-      } else {
-        setStatus("Premi “Attiva notifiche” per ricevere il menu ogni mattina.");
-        setBtnEnabled(true, "Attiva notifiche");
+
+      /*
+       * Permesso notifiche
+       */
+
+      if (
+        Notification.permission ===
+        "granted"
+      ) {
+
+        setStatus(
+          "Notifiche già attive ✅"
+        );
+
+        setBtnEnabled(
+          false,
+          "Notifiche attive"
+        );
+
+      }
+
+      else if (
+        Notification.permission ===
+        "denied"
+      ) {
+
+        setStatus(
+          "Notifiche bloccate. Sbloccale dalle impostazioni del browser/app."
+        );
+
+        setBtnEnabled(
+          false,
+          "Notifiche bloccate"
+        );
+
+      }
+
+      else {
+
+        setStatus(
+          "Premi “Attiva notifiche” per ricevere gli aggiornamenti."
+        );
+
+        setBtnEnabled(
+          true,
+          "Attiva notifiche"
+        );
       }
     }
 
-    // ----- click handler -----
+
+    /* =========================
+       ATTIVAZIONE PUSH
+       ========================= */
+
     async function onEnableClick() {
-      if (isIOS() && !isStandalone()) {
-        alert("Su iPhone le notifiche funzionano solo se l’app è installata.\nCondividi → Aggiungi alla schermata Home.");
+
+      if (
+        isIOS() &&
+        !isStandalone()
+      ) {
+
+        alert(
+          "Su iPhone le notifiche funzionano solo se l’app è installata.\nCondividi → Aggiungi alla schermata Home."
+        );
+
         return;
       }
+
+
       if (!canUsePush()) {
-        alert("Push non supportato su questo dispositivo/browser.");
+
+        alert(
+          "Push non supportato su questo dispositivo/browser."
+        );
+
         return;
       }
 
-      const perm = await Notification.requestPermission();
-      refreshPushUI();
-      if (perm !== "granted") return;
 
-      // Chiama la logica vera in app.js
-      if (typeof window.enablePush === "function") {
+      const perm =
+        await Notification
+          .requestPermission();
+
+
+      refreshPushUI();
+
+
+      if (
+        perm !== "granted"
+      ) {
+        return;
+      }
+
+
+      /*
+       * Logica vera contenuta
+       * in app.js
+       */
+
+      if (
+        typeof window.enablePush ===
+        "function"
+      ) {
+
         await window.enablePush();
-        setStatus("Notifiche attivate ✅");
-        setBtnEnabled(false, "Notifiche attive");
-      } else {
-        setStatus("Permesso concesso ✅ (manca window.enablePush in app.js)");
+
+        setStatus(
+          "Notifiche attivate ✅"
+        );
+
+        setBtnEnabled(
+          false,
+          "Notifiche attive"
+        );
+
+      }
+
+      else {
+
+        setStatus(
+          "Permesso concesso ✅ (manca window.enablePush in app.js)"
+        );
       }
     }
 
-    // ----- boot -----
-    window.addEventListener("load", () => {
-      console.log("APP LOADED ✅");
-      refreshPushUI();
 
-      const btn = document.getElementById("btn-enable");
-      if (btn) btn.addEventListener("click", onEnableClick);
+    /* =========================
+       AVVIO
+       ========================= */
 
-      document.addEventListener("visibilitychange", refreshPushUI);
-    });
+    window.addEventListener(
+      "load",
+      () => {
+
+        console.log(
+          "APP LOADED ✅"
+        );
+
+        refreshPushUI();
+
+
+        const btn =
+          document.getElementById(
+            "btn-enable"
+          );
+
+
+        if (btn) {
+
+          btn.addEventListener(
+            "click",
+            onEnableClick
+          );
+        }
+
+
+        document.addEventListener(
+          "visibilitychange",
+          refreshPushUI
+        );
+
+      }
+    );
+
   </script>
+
 </body>
 </html>
