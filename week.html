@@ -696,17 +696,42 @@ const shoppingToggle =
 const shoppingList =
   document.getElementById("shoppingList");
 
+
+function setShoppingOpen(open) {
+  if (!shoppingList || !shoppingToggle) return;
+
+  shoppingList.classList.toggle(
+    "hidden",
+    !open
+  );
+
+  shoppingToggle.textContent =
+    open
+      ? "🛒 Nascondi lista della spesa"
+      : "🛒 Mostra lista della spesa";
+}
+
+
+/*
+ * Se arriviamo dalla home tramite
+ * week.html#spesa, apriamo subito
+ * la lista della spesa.
+ */
+if (window.location.hash === "#spesa") {
+  setShoppingOpen(true);
+}
+
+
 shoppingToggle?.addEventListener(
   "click",
   () => {
 
-    const hidden =
-      shoppingList.classList.toggle("hidden");
+    const isOpen =
+      !shoppingList.classList.contains(
+        "hidden"
+      );
 
-    shoppingToggle.textContent =
-      hidden
-        ? "🛒 Mostra lista della spesa"
-        : "🛒 Nascondi lista della spesa";
+    setShoppingOpen(!isOpen);
   }
 );
 
