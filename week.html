@@ -492,15 +492,27 @@ function normalizeShoppingList(shoppingList) {
 }
 
 
-function renderShoppingList(shoppingList) {
-
+function renderShoppingList(shoppingList, week) {
   const container =
     document.getElementById("shoppingList");
 
   if (!container) return;
 
   container.innerHTML = "";
-const note =
+const storageKey =
+  `shopping-checked-${week}`;
+
+let checkedItems = {};
+
+try {
+  checkedItems =
+    JSON.parse(
+      localStorage.getItem(storageKey)
+    ) || {};
+} catch {
+  checkedItems = {};
+}
+  const note =
   document.createElement("div");
 
 note.className = "shopping-note";
@@ -572,7 +584,15 @@ container.appendChild(note);
 
         checkbox.id =
           `shopping-${category}-${index}`;
+const itemKey =
+  `${category}|${item.name}|${item.unit}`;
 
+checkbox.checked =
+  checkedItems[itemKey] === true;
+
+if (checkbox.checked) {
+  row.classList.add("checked");
+}
 
         const label =
           document.createElement("label");
@@ -591,15 +611,27 @@ container.appendChild(note);
           )}`;
 
 
-        checkbox.addEventListener(
-          "change",
-          () => {
-            row.classList.toggle(
-              "checked",
-              checkbox.checked
-            );
-          }
-        );
+       checkbox.addEventListener(
+  "change",
+  () => {
+
+    row.classList.toggle(
+      "checked",
+      checkbox.checked
+    );
+
+    if (checkbox.checked) {
+      checkedItems[itemKey] = true;
+    } else {
+      delete checkedItems[itemKey];
+    }
+
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify(checkedItems)
+    );
+  }
+);
 
 
         row.appendChild(checkbox);
@@ -650,7 +682,8 @@ async function loadWeek() {
     const plan =
       json.plan;
 renderShoppingList(
-  plan.shoppingList || {}
+  plan.shoppingList || {},
+  plan.week
 );
 
     weekLabel.textContent =
