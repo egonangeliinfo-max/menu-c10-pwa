@@ -1,9 +1,11 @@
 {
-  "name": "Menu scuola C10",
-  "short_name": "Menu C10",
+  "name": "Menu scuola e cene",
+  "short_name": "Menu e cene",
+  "description": "Menu scolastico, proposte per le cene e lista della spesa settimanale",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
+  "lang": "it",
   "icons": []
 }
