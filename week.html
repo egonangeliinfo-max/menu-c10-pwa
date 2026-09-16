@@ -117,6 +117,65 @@
       padding: 16px;
       text-align: center;
     }
+    .shopping-card {
+  background: white;
+  border: 1px solid #e6e6e6;
+  border-radius: 16px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.shopping-toggle {
+  width: 100%;
+  border: 0;
+  background: white;
+  padding: 16px;
+  text-align: left;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shopping-list {
+  padding: 0 16px 16px;
+}
+
+.shopping-list.hidden {
+  display: none;
+}
+
+.shopping-category {
+  margin-top: 16px;
+}
+
+.shopping-category h3 {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+
+.shopping-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.shopping-item input {
+  width: 19px;
+  height: 19px;
+  margin-top: 1px;
+}
+
+.shopping-item label {
+  flex: 1;
+}
+
+.shopping-item.checked label {
+  text-decoration: line-through;
+  color: #888;
+}
   </style>
 </head>
 
@@ -134,7 +193,20 @@
         Caricamento del piano settimanale...
       </div>
     </div>
+<div class="shopping-card">
+  <button
+    class="shopping-toggle"
+    id="shoppingToggle"
+    type="button"
+  >
+    🛒 Mostra lista della spesa
+  </button>
 
+  <div
+    id="shoppingList"
+    class="shopping-list hidden"
+  ></div>
+</div>
     <div class="btnrow">
       <a class="btn" href="./">🏠 Torna alla home</a>
 
@@ -340,7 +412,187 @@ function createDayCard(day) {
   return card;
 }
 
+function formatQuantity(qty, unit) {
+  if (unit === "g" && qty >= 1000) {
+    const kg = qty / 1000;
 
+    return (
+      Number.isInteger(kg)
+        ? kg
+        : kg.toFixed(1).replace(".", ",")
+    ) + " kg";
+  }
+
+  if (unit === "q.b.") {
+    return "q.b.";
+  }
+
+  return `${qty} ${unit}`;
+}
+
+
+function normalizeShoppingList(shoppingList) {
+  const normalized = {};
+
+  for (const [category, items] of
+    Object.entries(shoppingList || {})) {
+
+    normalized[category] = {};
+
+    for (const item of items || []) {
+
+      let name = item.name
+        .trim()
+        .toLowerCase();
+
+      /*
+       * Unifichiamo alcune denominazioni equivalenti.
+       */
+      if (
+        name === "verdura di stagione" ||
+        name === "verdure di stagione"
+      ) {
+        name = "verdure di stagione";
+      }
+
+      const key =
+        `${name}|${item.unit}`;
+
+      if (!normalized[category][key]) {
+        normalized[category][key] = {
+          name,
+          qty: 0,
+          unit: item.unit
+        };
+      }
+
+      normalized[category][key].qty +=
+        item.qty;
+    }
+  }
+
+  const result = {};
+
+  for (const [category, items] of
+    Object.entries(normalized)) {
+
+    result[category] =
+      Object.values(items);
+  }
+
+  return result;
+}
+
+
+function renderShoppingList(shoppingList) {
+
+  const container =
+    document.getElementById("shoppingList");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const normalized =
+    normalizeShoppingList(shoppingList);
+
+  const categoryInfo = {
+    verdura: "🥦 Verdura",
+    proteine: "🥩 Proteine",
+    cereali: "🍝 Pane, pasta e cereali",
+    latticini: "🧀 Latticini",
+    dispensa: "🧂 Dispensa"
+  };
+
+  for (const category of [
+    "verdura",
+    "proteine",
+    "cereali",
+    "latticini",
+    "dispensa"
+  ]) {
+
+    const items =
+      normalized[category] || [];
+
+    if (!items.length) continue;
+
+    const section =
+      document.createElement("div");
+
+    section.className =
+      "shopping-category";
+
+
+    const heading =
+      document.createElement("h3");
+
+    heading.textContent =
+      categoryInfo[category];
+
+    section.appendChild(heading);
+
+
+    items
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, "it")
+      )
+      .forEach((item, index) => {
+
+        const row =
+          document.createElement("div");
+
+        row.className =
+          "shopping-item";
+
+
+        const checkbox =
+          document.createElement("input");
+
+        checkbox.type = "checkbox";
+
+        checkbox.id =
+          `shopping-${category}-${index}`;
+
+
+        const label =
+          document.createElement("label");
+
+        label.htmlFor =
+          checkbox.id;
+
+        const displayName =
+          item.name.charAt(0).toUpperCase() +
+          item.name.slice(1);
+
+        label.textContent =
+          `${displayName} — ${formatQuantity(
+            item.qty,
+            item.unit
+          )}`;
+
+
+        checkbox.addEventListener(
+          "change",
+          () => {
+            row.classList.toggle(
+              "checked",
+              checkbox.checked
+            );
+          }
+        );
+
+
+        row.appendChild(checkbox);
+        row.appendChild(label);
+
+        section.appendChild(row);
+      });
+
+
+    container.appendChild(section);
+  }
+}
 async function loadWeek() {
 
   const content =
@@ -378,7 +630,9 @@ async function loadWeek() {
 
     const plan =
       json.plan;
-
+renderShoppingList(
+  plan.shoppingList || {}
+);
 
     weekLabel.textContent =
       "📅 " +
@@ -417,7 +671,25 @@ async function loadWeek() {
       "📅 Settimana non disponibile";
   }
 }
+const shoppingToggle =
+  document.getElementById("shoppingToggle");
 
+const shoppingList =
+  document.getElementById("shoppingList");
+
+shoppingToggle?.addEventListener(
+  "click",
+  () => {
+
+    const hidden =
+      shoppingList.classList.toggle("hidden");
+
+    shoppingToggle.textContent =
+      hidden
+        ? "🛒 Mostra lista della spesa"
+        : "🛒 Nascondi lista della spesa";
+  }
+);
 
 loadWeek();
 
