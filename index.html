@@ -76,7 +76,9 @@
       line-height: 1.4;
     }
 
-    .notifications {
+    .notifications,
+    .beta-info,
+    .feedback-section {
       background: white;
       border: 1px solid #e5e5e5;
       border-radius: 16px;
@@ -84,66 +86,130 @@
       margin-top: 18px;
     }
 
-    .notifications h2 {
+    .notifications h2,
+    .feedback-section h2 {
       font-size: 18px;
       margin: 0 0 6px;
     }
 
-    .notifications p {
+    .notifications p,
+    .feedback-section p {
       color: #666;
       font-size: 14px;
       line-height: 1.4;
     }
-.beta-info {
-  background: white;
-  border: 1px solid #e5e5e5;
-  border-radius: 16px;
-  padding: 16px;
-  margin-top: 18px;
-}
 
-.beta-info h2 {
-  font-size: 18px;
-  margin: 10px 0 6px;
-}
+    .beta-info h2 {
+      font-size: 18px;
+      margin: 10px 0 6px;
+    }
 
-.beta-info p {
-  color: #666;
-  font-size: 14px;
-  line-height: 1.45;
-}
+    .beta-info p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.45;
+    }
 
-.beta-badge {
-  display: inline-block;
-  padding: 5px 9px;
-  border-radius: 20px;
-  background: #f1f1f1;
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: 0.4px;
-}
+    .beta-badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #f1f1f1;
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.4px;
+    }
 
-.beta-note {
-  margin-bottom: 0;
-}
+    .beta-note {
+      margin-bottom: 0;
+    }
 
-.footer {
-  text-align: center;
-  margin: 28px 0 12px;
-  color: #666;
-  font-size: 13px;
-  line-height: 1.5;
-}
+    .rating {
+      display: flex;
+      gap: 6px;
+      margin: 12px 0 16px;
+    }
 
-.footer strong {
-  color: #333;
-}
+    .star {
+      border: 0;
+      background: transparent;
+      padding: 2px;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+      color: #c7c7c7;
+    }
 
-.footer-small {
-  margin-top: 4px;
-  font-size: 11px;
-  color: #999;
-}
+    .star.selected {
+      color: #f4b400;
+    }
+
+    .feedback-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    #feedback-message {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font: inherit;
+      line-height: 1.4;
+    }
+
+    #feedback-submit {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border: 0;
+      border-radius: 12px;
+      background: #222;
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #feedback-submit:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    #feedback-status {
+      margin: 12px 0 0;
+      min-height: 20px;
+      font-size: 14px;
+    }
+
+    .feedback-privacy {
+      margin-bottom: 0 !important;
+      font-size: 12px !important;
+      color: #888 !important;
+    }
+
+    .footer {
+      text-align: center;
+      margin: 28px 0 12px;
+      color: #666;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .footer strong {
+      color: #333;
+    }
+
+    .footer-small {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #999;
+    }
+
     #ios-help {
       display: none;
       padding: 12px;
@@ -188,16 +254,11 @@
     </p>
 
 
-    <!-- =========================
-         FUNZIONI PRINCIPALI
-         ========================= -->
+    <!-- FUNZIONI PRINCIPALI -->
 
     <div class="menu-grid">
 
-      <a
-        class="menu-card"
-        href="./today.html"
-      >
+      <a class="menu-card" href="./today.html">
         <div class="menu-title">
           📅 Menu di oggi
         </div>
@@ -208,10 +269,7 @@
       </a>
 
 
-      <a
-        class="menu-card"
-        href="./week.html"
-      >
+      <a class="menu-card" href="./week.html">
         <div class="menu-title">
           🍽️ Cene della settimana
         </div>
@@ -223,10 +281,7 @@
       </a>
 
 
-      <a
-        class="menu-card"
-        href="./week.html#spesa"
-      >
+      <a class="menu-card" href="./week.html#spesa">
         <div class="menu-title">
           🛒 Lista della spesa
         </div>
@@ -240,9 +295,7 @@
     </div>
 
 
-    <!-- =========================
-         NOTIFICHE
-         ========================= -->
+    <!-- NOTIFICHE -->
 
     <section class="notifications">
 
@@ -254,16 +307,9 @@
       </p>
 
 
-      <!-- ISTRUZIONI IPHONE/IPAD -->
-
       <div id="ios-help">
 
-        <div
-          style="
-            font-weight:700;
-            margin-bottom:6px;
-          "
-        >
+        <div style="font-weight:700; margin-bottom:6px;">
           🍎 iPhone/iPad
         </div>
 
@@ -273,12 +319,7 @@
           sulla schermata Home.
         </div>
 
-        <ol
-          style="
-            margin:0;
-            padding-left:18px;
-          "
-        >
+        <ol style="margin:0; padding-left:18px;">
           <li>
             Apri questa pagina in <b>Safari</b>
           </li>
@@ -313,43 +354,106 @@
 
 
     <pre id="out"></pre>
-<section class="beta-info">
-
-  <div class="beta-badge">
-    🧪 VERSIONE DI PROVA
-  </div>
-
-  <h2>Aiutaci a testarla</h2>
-
-  <p>
-    Questa è una versione sperimentale pensata
-    per aiutare le famiglie a coordinare
-    il menu scolastico con le cene della settimana
-    e la lista della spesa.
-  </p>
-
-  <p class="beta-note">
-    Le proposte alimentari sono indicative
-    e le quantità della lista della spesa
-    sono calcolate per 4 persone.
-  </p>
-
-</section>
 
 
-<footer class="footer">
+    <!-- VERSIONE DI PROVA -->
 
-  <div>
-    Progetto sperimentale ideato da
-    <strong>Egon Angeli</strong>
-  </div>
+    <section class="beta-info">
 
-  <div class="footer-small">
-    Menu scolastico da Risto3 ·
-    Cene e lista della spesa generate automaticamente
-  </div>
+      <div class="beta-badge">
+        🧪 VERSIONE DI PROVA
+      </div>
 
-</footer>
+      <h2>Aiutaci a testarla</h2>
+
+      <p>
+        Questa è una versione sperimentale pensata
+        per aiutare le famiglie a coordinare
+        il menu scolastico con le cene della settimana
+        e la lista della spesa.
+      </p>
+
+      <p class="beta-note">
+        Le proposte alimentari sono indicative
+        e le quantità della lista della spesa
+        sono calcolate per 4 persone.
+      </p>
+
+    </section>
+
+
+    <!-- FEEDBACK -->
+
+    <section class="feedback-section">
+
+      <h2>💬 Invia un feedback</h2>
+
+      <p>
+        Come ti sembra questa versione?
+        Segnalaci problemi, suggerimenti o idee
+        per migliorarla.
+      </p>
+
+      <div
+        class="rating"
+        id="feedback-rating"
+        aria-label="Valutazione da 1 a 5 stelle"
+      >
+        <button class="star" type="button" data-rating="1" aria-label="1 stella">★</button>
+        <button class="star" type="button" data-rating="2" aria-label="2 stelle">★</button>
+        <button class="star" type="button" data-rating="3" aria-label="3 stelle">★</button>
+        <button class="star" type="button" data-rating="4" aria-label="4 stelle">★</button>
+        <button class="star" type="button" data-rating="5" aria-label="5 stelle">★</button>
+      </div>
+
+      <label
+        class="feedback-label"
+        for="feedback-message"
+      >
+        Suggerimenti, problemi o idee
+      </label>
+
+      <textarea
+        id="feedback-message"
+        maxlength="1500"
+        placeholder="Scrivi qui il tuo feedback..."
+      ></textarea>
+
+      <button
+        id="feedback-submit"
+        type="button"
+      >
+        Invia feedback
+      </button>
+
+      <div
+        id="feedback-status"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <p class="feedback-privacy">
+        🔒 Il feedback è anonimo.
+        Non inserire dati personali nel messaggio.
+      </p>
+
+    </section>
+
+
+    <footer class="footer">
+
+      <div>
+        Progetto sperimentale ideato da
+        <strong>Egon Angeli</strong>
+      </div>
+
+      <div class="footer-small">
+        Menu scolastico da Risto3 ·
+        Cene e lista della spesa generate automaticamente
+      </div>
+
+    </footer>
+
   </main>
 
 
@@ -360,7 +464,15 @@
   <script>
 
     /* =========================
-       HELPERS
+       CONFIGURAZIONE
+       ========================= */
+
+    const FEEDBACK_URL =
+      "https://menu-push-c10.egon-angeli-info.workers.dev/feedback";
+
+
+    /* =========================
+       HELPERS PUSH
        ========================= */
 
     function isIOS() {
@@ -458,10 +570,6 @@
         canUsePush();
 
 
-      /*
-       * iPhone/iPad non installato
-       */
-
       if (ios && !standalone) {
 
         show(
@@ -482,20 +590,11 @@
       }
 
 
-      /*
-       * iOS installata
-       * oppure altro dispositivo
-       */
-
       show(
         "ios-help",
         false
       );
 
-
-      /*
-       * Push non supportato
-       */
 
       if (!pushOk) {
 
@@ -511,10 +610,6 @@
         return;
       }
 
-
-      /*
-       * Permesso notifiche
-       */
 
       if (
         Notification.permission ===
@@ -606,11 +701,6 @@
       }
 
 
-      /*
-       * Logica vera contenuta
-       * in app.js
-       */
-
       if (
         typeof window.enablePush ===
         "function"
@@ -639,6 +729,167 @@
 
 
     /* =========================
+       FEEDBACK
+       ========================= */
+
+    let selectedRating = 0;
+
+
+    function refreshStars() {
+
+      const stars =
+        document.querySelectorAll(
+          ".star"
+        );
+
+      stars.forEach((star) => {
+
+        const rating =
+          Number(
+            star.dataset.rating
+          );
+
+        star.classList.toggle(
+          "selected",
+          rating <= selectedRating
+        );
+
+      });
+    }
+
+
+    function selectRating(rating) {
+
+      selectedRating =
+        Number(rating);
+
+      refreshStars();
+    }
+
+
+    async function sendFeedback() {
+
+      const messageEl =
+        document.getElementById(
+          "feedback-message"
+        );
+
+      const statusEl =
+        document.getElementById(
+          "feedback-status"
+        );
+
+      const submitBtn =
+        document.getElementById(
+          "feedback-submit"
+        );
+
+
+      const message =
+        messageEl.value.trim();
+
+
+      if (
+        selectedRating < 1 ||
+        selectedRating > 5
+      ) {
+
+        statusEl.textContent =
+          "⭐ Seleziona una valutazione da 1 a 5 stelle.";
+
+        return;
+      }
+
+
+      if (message.length < 2) {
+
+        statusEl.textContent =
+          "✏️ Scrivi un breve commento prima di inviare.";
+
+        return;
+      }
+
+
+      submitBtn.disabled = true;
+
+      submitBtn.textContent =
+        "Invio...";
+
+      statusEl.textContent = "";
+
+
+      try {
+
+        const response =
+          await fetch(
+            FEEDBACK_URL,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                rating:
+                  selectedRating,
+
+                message,
+
+                page:
+                  "home"
+              })
+            }
+          );
+
+
+        if (!response.ok) {
+
+          const text =
+            await response.text();
+
+          throw new Error(
+            text ||
+            `HTTP ${response.status}`
+          );
+        }
+
+
+        statusEl.textContent =
+          "✅ Grazie! Feedback inviato.";
+
+        messageEl.value = "";
+
+        selectedRating = 0;
+
+        refreshStars();
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Feedback error:",
+          error
+        );
+
+        statusEl.textContent =
+          "❌ Non è stato possibile inviare il feedback. Riprova tra poco.";
+
+      }
+
+      finally {
+
+        submitBtn.disabled = false;
+
+        submitBtn.textContent =
+          "Invia feedback";
+      }
+    }
+
+
+    /* =========================
        AVVIO
        ========================= */
 
@@ -649,6 +900,7 @@
         console.log(
           "APP LOADED ✅"
         );
+
 
         refreshPushUI();
 
@@ -672,6 +924,38 @@
           "visibilitychange",
           refreshPushUI
         );
+
+
+        document
+          .querySelectorAll(".star")
+          .forEach((star) => {
+
+            star.addEventListener(
+              "click",
+              () => {
+
+                selectRating(
+                  star.dataset.rating
+                );
+              }
+            );
+
+          });
+
+
+        const feedbackSubmit =
+          document.getElementById(
+            "feedback-submit"
+          );
+
+
+        if (feedbackSubmit) {
+
+          feedbackSubmit.addEventListener(
+            "click",
+            sendFeedback
+          );
+        }
 
       }
     );
