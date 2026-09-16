@@ -3,103 +3,460 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+
   <title>Menu scuola di oggi</title>
+
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:16px;line-height:1.35}
-    .card{max-width:720px;margin:0 auto;border:1px solid #e6e6e6;border-radius:14px;padding:14px 14px 10px}
-    h1{font-size:18px;margin:0 0 6px}
-    .sub{color:#555;margin:0 0 10px}
-    ul{margin:10px 0 14px;padding-left:18px}
-    li{margin:4px 0}
-    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .btn{display:inline-block;padding:10px 12px;border:1px solid #ccc;border-radius:12px;text-decoration:none;color:inherit}
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family:
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      margin: 0;
+      padding: 20px;
+      line-height: 1.35;
+      background: #f6f6f6;
+      color: #222;
+    }
+
+    .card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+
+    .sub {
+      color: #555;
+      margin: 0 0 14px;
+    }
+
+    ul {
+      margin: 12px 0 20px;
+      padding-left: 18px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .weekly-title {
+      margin-top: 22px;
+      margin-bottom: 10px;
+      padding-top: 18px;
+      border-top: 1px solid #eee;
+      font-size: 15px;
+      font-weight: 700;
+      color: #555;
+    }
+
+    .main-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .main-link {
+      display: block;
+      padding: 13px 14px;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      text-decoration: none;
+      color: inherit;
+      background: #fafafa;
+    }
+
+    .main-link strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 16px;
+    }
+
+    .main-link span {
+      display: block;
+      color: #666;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .btnrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      text-decoration: none;
+      color: inherit;
+      background: white;
+    }
+
+    .footer {
+      max-width: 720px;
+      margin: 18px auto 0;
+      text-align: center;
+      color: #999;
+      font-size: 11px;
+      line-height: 1.5;
+    }
   </style>
 </head>
+
 <body>
+
   <div class="card">
+
     <h1>🍽️ Menu scuola di oggi</h1>
-    <p class="sub" id="date">📅 …</p>
+
+    <p
+      class="sub"
+      id="date"
+    >
+      📅 …
+    </p>
+
+
+    <!-- MENU SCOLASTICO -->
 
     <ul id="list"></ul>
 
-    <div class="btnrow">
-      <a class="btn" id="openSrc" href="#" target="_blank" rel="noopener">Apri sito ufficiale</a>
-      <a class="btn" href="./">Torna alla home</a>
+
+    <!-- ACCESSO ALLA SETTIMANA -->
+
+    <div class="weekly-title">
+      Organizza anche le cene
     </div>
+
+
+    <div class="main-links">
+
+      <a
+        class="main-link"
+        href="./week.html"
+      >
+        <strong>
+          🍽️ Cene della settimana
+        </strong>
+
+        <span>
+          Guarda le cinque cene proposte
+          in base ai pranzi scolastici.
+        </span>
+      </a>
+
+
+      <a
+        class="main-link"
+        href="./week.html#spesa"
+      >
+        <strong>
+          🛒 Lista della spesa
+        </strong>
+
+        <span>
+          Ingredienti per le cinque cene,
+          con quantità indicative per 4 persone.
+        </span>
+      </a>
+
+    </div>
+
+
+    <!-- NAVIGAZIONE -->
+
+    <div class="btnrow">
+
+      <a
+        class="btn"
+        id="openSrc"
+        href="#"
+        target="_blank"
+        rel="noopener"
+      >
+        Apri sito ufficiale
+      </a>
+
+      <a
+        class="btn"
+        href="./"
+      >
+        🏠 Home
+      </a>
+
+    </div>
+
   </div>
 
+
+  <div class="footer">
+    🧪 Versione di prova ·
+    Progetto sperimentale ideato da
+    <strong>Egon Angeli</strong>
+  </div>
+
+
 <script>
-  const WORKER_URL = "https://menu-push-c10.egon-angeli-info.workers.dev";
+
+  const WORKER_URL =
+    "https://menu-push-c10.egon-angeli-info.workers.dev";
+
 
   async function loadMenu() {
-    const params = new URLSearchParams(location.search);
 
-    let date = params.get("date");
+    const params =
+      new URLSearchParams(
+        location.search
+      );
+
+
+    let date =
+      params.get("date");
+
+
     let dishes = null;
-    let source = params.get("source") || "https://menuscuole.risto3cloud.it/menu";
-    const dishesRaw = params.get("dishes");
+
+
+    let source =
+      params.get("source")
+      ||
+      "https://menuscuole.risto3cloud.it/menu";
+
+
+    const dishesRaw =
+      params.get("dishes");
+
+
+    /*
+     * ========================================
+     * ARRIVO DALLA NOTIFICA
+     * ========================================
+     */
 
     if (dishesRaw) {
-      // Caso: arrivo da notifica (con parametri)
+
       try {
-        dishes = JSON.parse(dishesRaw);
-      } catch (e) {
-        console.error("Errore parse dishes dalla query:", e);
+
+        dishes =
+          JSON.parse(dishesRaw);
+
+      }
+
+      catch (e) {
+
+        console.error(
+          "Errore parse dishes dalla query:",
+          e
+        );
+
         dishes = [];
       }
-    } else {
-      // Caso: apertura manuale → chiedi al Worker il menu di oggi
+
+    }
+
+
+    /*
+     * ========================================
+     * APERTURA MANUALE
+     * ========================================
+     */
+
+    else {
+
       try {
-        const res = await fetch(WORKER_URL + "/menu-today?sourceId=c10");
+
+        const res =
+          await fetch(
+            WORKER_URL +
+            "/menu-today?sourceId=c10"
+          );
+
+
         if (res.ok) {
-          const json = await res.json();
-          if (json.ok && json.menu) {
-            date = json.menu.date || date;
-            dishes = json.menu.dishes || [];
-            source = json.menu.source || source;
+
+          const json =
+            await res.json();
+
+
+          if (
+            json.ok &&
+            json.menu
+          ) {
+
+            date =
+              json.menu.date
+              ||
+              date;
+
+
+            dishes =
+              json.menu.dishes
+              ||
+              [];
+
+
+            source =
+              json.menu.source
+              ||
+              source;
           }
-        } else {
-          console.warn("menu-today non disponibile:", res.status);
+
         }
-      } catch (e) {
-        console.error("Errore nel recupero menu-today:", e);
+
+        else {
+
+          console.warn(
+            "menu-today non disponibile:",
+            res.status
+          );
+        }
+
       }
+
+      catch (e) {
+
+        console.error(
+          "Errore nel recupero menu-today:",
+          e
+        );
+      }
+
     }
 
-    if (!date) date = "Oggi";
-    if (!Array.isArray(dishes)) dishes = [];
 
-    // Aggiorna data
-    const dateEl = document.getElementById("date");
+    /*
+     * ========================================
+     * VALORI DI FALLBACK
+     * ========================================
+     */
+
+    if (!date) {
+      date = "Oggi";
+    }
+
+
+    if (!Array.isArray(dishes)) {
+      dishes = [];
+    }
+
+
+    /*
+     * ========================================
+     * DATA
+     * ========================================
+     */
+
+    const dateEl =
+      document.getElementById(
+        "date"
+      );
+
+
     if (dateEl) {
-      dateEl.textContent = "📅 " + date;
+
+      dateEl.textContent =
+        "📅 " + date;
     }
 
-    // Aggiorna lista piatti
-    const ul = document.getElementById("list");
+
+    /*
+     * ========================================
+     * PIATTI
+     * ========================================
+     */
+
+    const ul =
+      document.getElementById(
+        "list"
+      );
+
+
     if (ul) {
+
       ul.innerHTML = "";
+
+
       if (!dishes.length) {
-        const li = document.createElement("li");
-        li.textContent = "Nessun piatto trovato";
+
+        const li =
+          document.createElement(
+            "li"
+          );
+
+
+        li.textContent =
+          "Nessun piatto trovato";
+
+
         ul.appendChild(li);
-      } else {
-        dishes.forEach((d) => {
-          const li = document.createElement("li");
-          li.textContent = "• " + String(d);
-          ul.appendChild(li);
-        });
+
       }
+
+      else {
+
+        dishes.forEach(
+          (dish) => {
+
+            const li =
+              document.createElement(
+                "li"
+              );
+
+
+            li.textContent =
+              String(dish);
+
+
+            ul.appendChild(li);
+
+          }
+        );
+
+      }
+
     }
 
-    // Aggiorna link "Apri sito ufficiale"
-    const open = document.getElementById("openSrc");
+
+    /*
+     * ========================================
+     * SITO UFFICIALE
+     * ========================================
+     */
+
+    const open =
+      document.getElementById(
+        "openSrc"
+      );
+
+
     if (open) {
       open.href = source;
     }
+
   }
 
+
   loadMenu();
+
 </script>
 
 
