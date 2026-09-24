@@ -195,14 +195,36 @@
       <h1>🍽️ Cene della settimana</h1>
       <p class="week" id="weekLabel">📅 Caricamento...</p>
     </div>
-<div class="btnrow" id="weekNavigation">
-  <a class="btn" id="currentWeekBtn" href="#">
-    ← Questa settimana
+<div class="week-nav" id="weekNavigation">
+
+  <a
+    class="week-arrow"
+    id="currentWeekBtn"
+    href="#"
+    aria-label="Questa settimana"
+  >
+    ‹
   </a>
 
-  <a class="btn" id="nextWeekBtn" href="#">
-    Prossima settimana →
+  <div class="week-nav-center">
+    <div id="navWeekLabel" class="week-nav-label">
+      Settimana
+    </div>
+
+    <div id="navWeekType" class="week-nav-type">
+      Questa settimana
+    </div>
+  </div>
+
+  <a
+    class="week-arrow"
+    id="nextWeekBtn"
+    href="#"
+    aria-label="Prossima settimana"
+  >
+    ›
   </a>
+
 </div>
     <div id="content">
       <div class="status">
