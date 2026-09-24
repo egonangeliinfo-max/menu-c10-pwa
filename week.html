@@ -184,45 +184,32 @@
   font-size: 14px;
   line-height: 1.4;
 }
-  .week-nav {
-  display: grid;
-  grid-template-columns: 46px 1fr 46px;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 14px;
-  background: white;
-  border: 1px solid #e6e6e6;
-  border-radius: 16px;
-  padding: 8px;
+<div class="week-switch">
+  <a
+    id="weekSwitchBtn"
+    class="week-switch-btn"
+    href="#"
+  >
+    📅 Guarda la prossima settimana →
+  </a>
+</div>
+    .week-switch {
+  margin: 0 0 16px;
 }
 
-.week-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 42px;
-  border-radius: 12px;
-  background: #f6f6f6;
+.week-switch-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 14px;
   text-decoration: none;
   color: #222;
-  font-size: 30px;
-  line-height: 1;
-}
-
-.week-nav-center {
+  font-weight: 650;
   text-align: center;
-}
-
-.week-nav-label {
-  font-weight: 700;
   font-size: 15px;
 }
-
-.week-nav-type {
-  margin-top: 2px;
-  color: #777;
-  font-size: 12px;
-}  
   </style>
 </head>
 
@@ -774,26 +761,36 @@ function setupWeekNavigation() {
   const nextWeek =
     getMonday(1);
 
-  const currentBtn =
+  const requestedWeek =
+    getRequestedWeek();
+
+  const button =
     document.getElementById(
-      "currentWeekBtn"
+      "weekSwitchBtn"
     );
 
-  const nextBtn =
-    document.getElementById(
-      "nextWeekBtn"
-    );
+  if (!button) return;
 
-  if (currentBtn) {
-    currentBtn.href =
-      `./week.html?week=${currentWeek}`;
-  }
+  if (requestedWeek === currentWeek) {
 
-  if (nextBtn) {
-    nextBtn.href =
+    button.href =
       `./week.html?week=${nextWeek}`;
+
+    button.textContent =
+      "📅 Guarda la prossima settimana →";
+
+  } else {
+
+    button.href =
+      `./week.html?week=${currentWeek}`;
+
+    button.textContent =
+      "← Torna a questa settimana";
+
   }
 }
+
+  
   async function loadWeek() {
 
   const content =
