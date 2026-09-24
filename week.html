@@ -195,7 +195,15 @@
       <h1>🍽️ Cene della settimana</h1>
       <p class="week" id="weekLabel">📅 Caricamento...</p>
     </div>
+<div class="btnrow" id="weekNavigation">
+  <a class="btn" id="currentWeekBtn" href="#">
+    ← Questa settimana
+  </a>
 
+  <a class="btn" id="nextWeekBtn" href="#">
+    Prossima settimana →
+  </a>
+</div>
     <div id="content">
       <div class="status">
         Caricamento del piano settimanale...
@@ -644,7 +652,88 @@ if (checkbox.checked) {
     container.appendChild(section);
   }
 }
-async function loadWeek() {
+function dateToKey(date) {
+  const year = date.getFullYear();
+  const month =
+    String(date.getMonth() + 1).padStart(2, "0");
+  const day =
+    String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+function getMonday(offsetWeeks = 0) {
+
+  const now = new Date();
+
+  const date =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+  const day = date.getDay();
+
+  const diff =
+    day === 0
+      ? -6
+      : 1 - day;
+
+  date.setDate(
+    date.getDate() +
+    diff +
+    (offsetWeeks * 7)
+  );
+
+  return dateToKey(date);
+}
+
+
+function getRequestedWeek() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return (
+    params.get("week") ||
+    getMonday(0)
+  );
+}
+
+
+function setupWeekNavigation() {
+
+  const currentWeek =
+    getMonday(0);
+
+  const nextWeek =
+    getMonday(1);
+
+  const currentBtn =
+    document.getElementById(
+      "currentWeekBtn"
+    );
+
+  const nextBtn =
+    document.getElementById(
+      "nextWeekBtn"
+    );
+
+  if (currentBtn) {
+    currentBtn.href =
+      `./week.html?week=${currentWeek}`;
+  }
+
+  if (nextBtn) {
+    nextBtn.href =
+      `./week.html?week=${nextWeek}`;
+  }
+}
+  async function loadWeek() {
 
   const content =
     document.getElementById("content");
@@ -654,11 +743,15 @@ async function loadWeek() {
 
   try {
 
-    const response =
-      await fetch(
-        WORKER_URL +
-        "/weekly-plan?sourceId=c10"
-      );
+const requestedWeek =
+  getRequestedWeek();
+
+const response =
+  await fetch(
+    WORKER_URL +
+    "/weekly-plan?sourceId=c10&week=" +
+    encodeURIComponent(requestedWeek)
+  );
 
     if (!response.ok) {
       throw new Error(
@@ -768,6 +861,7 @@ shoppingToggle?.addEventListener(
   }
 );
 
+setupWeekNavigation();
 loadWeek();
 
 </script>
