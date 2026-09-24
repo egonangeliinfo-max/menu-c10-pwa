@@ -753,25 +753,18 @@ function getRequestedWeek() {
 }
 
 
-function setupWeekNavigation() {
+function setupWeekNavigation(plan) {
 
-  const currentWeek =
-    getMonday(0);
-
-  const nextWeek =
-    getMonday(1);
-
-  const requestedWeek =
-    getRequestedWeek();
+  const currentWeek = getMonday(0);
+  const nextWeek = getMonday(1);
 
   const button =
-    document.getElementById(
-      "weekSwitchBtn"
-    );
+    document.getElementById("weekSwitchBtn");
 
-  if (!button) return;
+  if (!button || !plan) return;
 
-  if (requestedWeek === currentWeek) {
+  // Ci basiamo sulla settimana realmente caricata dal Worker
+  if (plan.week === currentWeek) {
 
     button.href =
       `./week.html?week=${nextWeek}`;
@@ -832,6 +825,7 @@ const response =
 
     const plan =
       json.plan;
+    setupWeekNavigation(plan);
 renderShoppingList(
   plan.shoppingList || {},
   plan.week
@@ -919,7 +913,6 @@ shoppingToggle?.addEventListener(
   }
 );
 
-setupWeekNavigation();
 loadWeek();
 
 </script>
