@@ -868,11 +868,28 @@ function setShoppingOpen(open) {
  * week.html#spesa, apriamo subito
  * la lista della spesa.
  */
+
 if (window.location.hash === "#spesa") {
+
+  // Apre la lista della spesa
   setShoppingOpen(true);
+
+  // Porta lo schermo direttamente
+  // alla sezione della lista della spesa
+  setTimeout(() => {
+
+    const shoppingCard =
+      document.querySelector(".shopping-card");
+
+    if (shoppingCard) {
+      shoppingCard.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+
+  }, 150);
 }
-
-
 shoppingToggle?.addEventListener(
   "click",
   () => {
