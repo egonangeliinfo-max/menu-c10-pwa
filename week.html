@@ -853,7 +853,7 @@ const shoppingList =
   document.getElementById("shoppingList");
 
 
-function setShoppingOpen(open, scrollToList = false) {
+function setShoppingOpen(open) {
 
   if (!shoppingList || !shoppingToggle) {
     return;
@@ -868,34 +868,6 @@ function setShoppingOpen(open, scrollToList = false) {
     open
       ? "🛒 Nascondi lista della spesa"
       : "🛒 Mostra lista della spesa";
-
-
-  /*
-   * Se richiesto, porta lo schermo
-   * direttamente alla lista della spesa.
-   */
-  if (open && scrollToList) {
-
-    requestAnimationFrame(() => {
-
-      const shoppingCard =
-        document.querySelector(
-          ".shopping-card"
-        );
-
-      if (shoppingCard) {
-
-        shoppingCard.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-
-      }
-
-    });
-
-  }
-
 }
 
 
