@@ -14,7 +14,25 @@
     }
 
     body {
-      margin: 0;
+      margin: 0;try {
+  // Registra (se già registrato, lo riusa)
+  await navigator.serviceWorker.register("./sw.js");
+
+  // Aspetta che diventi "active"
+  const readyReg =
+    await navigator.serviceWorker.ready;
+
+  return readyReg;
+
+} catch (e) {
+
+  console.error(
+    "Errore Service Worker:",
+    e
+  );
+
+  return null;
+}
       padding: 20px;
       font-family:
         system-ui,
@@ -498,8 +516,6 @@
 </section>
 
 
-
-    <pre id="out"></pre>
 
 
     <!-- VERSIONE DI PROVA -->
