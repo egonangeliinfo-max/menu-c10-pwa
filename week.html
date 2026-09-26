@@ -769,7 +769,10 @@ function setupWeekNavigation(plan) {
 
 const requestedWeek =
   getRequestedWeek();
-
+console.log(
+  "Settimana richiesta al Worker:",
+  requestedWeek
+);
 const response =
   await fetch(
     WORKER_URL +
