@@ -120,6 +120,43 @@
       font-size: 11px;
       line-height: 1.5;
     }
+    .dinner-card {
+  margin-top: 22px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+}
+
+.dinner-label {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+.dinner-name {
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.dinner-info {
+  margin-top: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.dinner-error {
+  margin-top: 18px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  color: #666;
+  font-size: 14px;
+}
   </style>
 </head>
 
@@ -141,7 +178,29 @@
 
     <ul id="list"></ul>
 
+<!-- CENA DI OGGI -->
 
+<section
+  class="dinner-card"
+  id="dinner-card"
+  style="display:none;"
+>
+
+  <div class="dinner-label">
+    🌙 STASERA
+  </div>
+
+  <div
+    class="dinner-name"
+    id="dinner-name"
+  ></div>
+
+  <div
+    class="dinner-info"
+    id="dinner-info"
+  ></div>
+
+</section>
     <!-- ACCESSO ALLA SETTIMANA -->
 
     <div class="weekly-title">
@@ -199,7 +258,165 @@
   const WORKER_URL =
     "https://menu-push-c10.egon-angeli-info.workers.dev";
 
+function normalizeDateText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
+
+async function loadDinner(date) {
+
+  try {
+
+    /*
+     * Chiediamo al Worker il piano settimanale.
+     *
+     * Il Worker restituisce il piano "latest".
+     * Cerchiamo poi il giorno che corrisponde
+     * esattamente alla data del menu visualizzato.
+     */
+
+    const res =
+      await fetch(
+        WORKER_URL +
+        "/weekly-plan?sourceId=c10"
+      );
+
+    if (!res.ok) {
+      console.warn(
+        "Piano settimanale non disponibile:",
+        res.status
+      );
+      return;
+    }
+
+
+    const json =
+      await res.json();
+
+
+    if (
+      !json.ok ||
+      !json.plan ||
+      !Array.isArray(json.plan.days)
+    ) {
+      return;
+    }
+
+
+    const targetDate =
+      normalizeDateText(date);
+
+
+    const day =
+      json.plan.days.find(
+        (item) =>
+          normalizeDateText(item.date) ===
+          targetDate
+      );
+
+
+    /*
+     * Sicurezza:
+     * se la data non coincide con nessun giorno
+     * del piano non mostriamo alcuna cena.
+     */
+    if (
+      !day ||
+      !day.dinner
+    ) {
+
+      console.log(
+        "Nessuna cena trovata per:",
+        date
+      );
+
+      return;
+    }
+
+
+    const dinner =
+      day.dinner;
+
+
+    const card =
+      document.getElementById(
+        "dinner-card"
+      );
+
+
+    const name =
+      document.getElementById(
+        "dinner-name"
+      );
+
+
+    const info =
+      document.getElementById(
+        "dinner-info"
+      );
+
+
+    if (name) {
+      name.textContent =
+        dinner.name || "Cena proposta";
+    }
+
+
+    if (info) {
+
+      const details = [];
+
+      if (dinner.minutes) {
+        details.push(
+          `⏱️ ${dinner.minutes} min`
+        );
+      }
+
+      if (dinner.protein) {
+        details.push(
+          `🍴 ${formatDinnerValue(
+            dinner.protein
+          )}`
+        );
+      }
+
+      info.textContent =
+        details.join(" · ");
+    }
+
+
+    if (card) {
+      card.style.display = "block";
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Errore recupero cena:",
+      error
+    );
+
+  }
+}
+
+
+function formatDinnerValue(value) {
+
+  return String(value || "")
+    .replace(/_/g, " ")
+    .replace(
+      /\b\w/g,
+      (letter) =>
+        letter.toUpperCase()
+    );
+}
   async function loadMenu() {
 
     const params =
@@ -414,7 +631,13 @@
 
     }
 
+/*
+ * ========================================
+ * CENA DEL GIORNO
+ * ========================================
+ */
 
+await loadDinner(date);
 
 
   }
