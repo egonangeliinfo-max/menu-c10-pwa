@@ -14,19 +14,25 @@ const swReadyPromise = (async () => {
     return null;
   }
 
-  try {
-    // Registra (se già registrato, lo riusa)
-    await navigator.serviceWorker.register("./sw.js");
-    // Aspetta che diventi "active"
-    const readyReg = await navigator.serviceWorker.ready;
-    const out = getOutEl();
-    if (out) out.textContent = "Service Worker pronto ✅";
-    return readyReg;
-  } catch (e) {
-    const out = getOutEl();
-    if (out) out.textContent = "Errore SW: " + String(e);
-    return null;
-  }
+try {
+  // Registra (se già registrato, lo riusa)
+  await navigator.serviceWorker.register("./sw.js");
+
+  // Aspetta che diventi "active"
+  const readyReg =
+    await navigator.serviceWorker.ready;
+
+  return readyReg;
+
+} catch (e) {
+
+  console.error(
+    "Errore Service Worker:",
+    e
+  );
+
+  return null;
+}
 })();
 
 // Funzione che index.html chiamerà dopo il permesso notifiche
