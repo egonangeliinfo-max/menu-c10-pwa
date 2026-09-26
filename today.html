@@ -388,11 +388,28 @@ async function loadDinner(date) {
      * esattamente alla data del menu visualizzato.
      */
 
-    const res =
-      await fetch(
-        WORKER_URL +
-        "/weekly-plan?sourceId=c10"
-      );
+    const week =
+  getWeekMonday(date);
+
+
+if (!week) {
+  return;
+}
+
+
+console.log(
+  "Cerco cena nella settimana:",
+  week
+);
+
+
+const res =
+  await fetch(
+    WORKER_URL +
+    "/weekly-plan?sourceId=c10" +
+    "&week=" +
+    encodeURIComponent(week)
+  );
 
     if (!res.ok) {
       console.warn(
