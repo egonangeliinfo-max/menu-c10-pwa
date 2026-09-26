@@ -756,22 +756,75 @@
         return;
       }
 
+if (
+  Notification.permission ===
+  "granted"
+) {
 
-      if (
-        Notification.permission ===
-        "granted"
-      ) {
+  /*
+   * Notifiche già autorizzate:
+   * nascondiamo pulsante e messaggio tecnico
+   * e mostriamo la conferma finale.
+   */
 
-        setStatus(
-          "Notifiche già attive ✅"
-        );
+  const status =
+    document.getElementById(
+      "push-status"
+    );
 
-        setBtnEnabled(
-          false,
-          "Notifiche attive"
-        );
+  const btn =
+    document.getElementById(
+      "btn-enable"
+    );
 
-      }
+  const complete =
+    document.getElementById(
+      "setup-complete"
+    );
+
+  const badge =
+    document.querySelector(
+      ".setup-badge"
+    );
+
+  const title =
+    document.getElementById(
+      "setup-title"
+    );
+
+  const intro =
+    document.getElementById(
+      "setup-intro"
+    );
+
+  if (status) {
+    status.style.display = "none";
+  }
+
+  if (btn) {
+    btn.style.display = "none";
+  }
+
+  if (complete) {
+    complete.style.display = "block";
+  }
+
+  if (badge) {
+    badge.textContent =
+      "✓ CONFIGURAZIONE COMPLETATA";
+  }
+
+  if (title) {
+    title.textContent =
+      "Il servizio è attivo";
+  }
+
+  if (intro) {
+    intro.style.display = "none";
+  }
+
+}
+
 
       else if (
         Notification.permission ===
@@ -852,16 +905,9 @@
         "function"
       ) {
 
-        await window.enablePush();
+      await window.enablePush();
 
-        setStatus(
-          "Notifiche attivate ✅"
-        );
-
-        setBtnEnabled(
-          false,
-          "Notifiche attive"
-        );
+refreshPushUI();  
 
       }
 
