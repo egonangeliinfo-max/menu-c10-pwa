@@ -267,7 +267,115 @@ function normalizeDateText(value) {
     .trim();
 }
 
+function getWeekMonday(dateText) {
 
+  /*
+   * Converte ad esempio:
+   * "Venerdì 25 settembre 2026"
+   * nel lunedì della stessa settimana:
+   * "2026-09-21"
+   */
+
+  const months = {
+    gennaio: 0,
+    febbraio: 1,
+    marzo: 2,
+    aprile: 3,
+    maggio: 4,
+    giugno: 5,
+    luglio: 6,
+    agosto: 7,
+    settembre: 8,
+    ottobre: 9,
+    novembre: 10,
+    dicembre: 11
+  };
+
+
+  const normalized =
+    normalizeDateText(dateText);
+
+
+  const match =
+    normalized.match(
+      /(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+(\d{4})/
+    );
+
+
+  if (!match) {
+    console.warn(
+      "Non riesco a ricavare la settimana da:",
+      dateText
+    );
+
+    return null;
+  }
+
+
+  const day =
+    Number(match[1]);
+
+  const month =
+    months[match[2]];
+
+  const year =
+    Number(match[3]);
+
+
+  /*
+   * Usiamo mezzogiorno per evitare problemi
+   * legati a cambio ora legale/solare.
+   */
+  const date =
+    new Date(
+      year,
+      month,
+      day,
+      12,
+      0,
+      0
+    );
+
+
+  const weekday =
+    date.getDay();
+
+
+  /*
+   * JS:
+   * domenica = 0
+   * lunedì   = 1
+   * ...
+   */
+
+  const daysFromMonday =
+    weekday === 0
+      ? 6
+      : weekday - 1;
+
+
+  date.setDate(
+    date.getDate() -
+    daysFromMonday
+  );
+
+
+  const yyyy =
+    date.getFullYear();
+
+  const mm =
+    String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
+
+  const dd =
+    String(
+      date.getDate()
+    ).padStart(2, "0");
+
+
+  return `${yyyy}-${mm}-${dd}`;
+}
 async function loadDinner(date) {
 
   try {
