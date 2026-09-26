@@ -239,6 +239,109 @@
       white-space: pre-wrap;
       font-size: 12px;
     }
+    /* =========================
+   PRIMA CONFIGURAZIONE
+   ========================= */
+
+.setup-badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #f1f1f1;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.4px;
+}
+
+.setup-device-title {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.setup-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.setup-step > span {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #222;
+  color: white;
+  font-weight: 750;
+}
+
+.setup-step div {
+  padding-top: 4px;
+  line-height: 1.35;
+}
+
+.setup-step small {
+  display: block;
+  margin-top: 3px;
+  color: #777;
+}
+
+.setup-tip {
+  margin-top: 14px;
+  padding: 11px;
+  border-radius: 12px;
+  background: #f3f3f3;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#push-status {
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: #f6f6f6;
+}
+
+#btn-enable {
+  min-height: 48px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#setup-complete {
+  margin-top: 10px;
+  text-align: center;
+  padding: 16px 10px 6px;
+}
+
+.setup-complete-icon {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 9px;
+  border-radius: 50%;
+  background: #222;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+#setup-complete strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17px;
+}
+
+#setup-complete div:last-child {
+  color: #666;
+  font-size: 13px;
+}
   </style>
 </head>
 
@@ -294,63 +397,106 @@
 
     </div>
 
+    <!-- PRIMA CONFIGURAZIONE / NOTIFICHE -->
 
-    <!-- NOTIFICHE -->
+<section class="notifications" id="setup-card">
 
-    <section class="notifications">
+  <div class="setup-badge">
+    👋 PRIMA CONFIGURAZIONE
+  </div>
 
-      <h2>🔔 Notifiche</h2>
+  <h2 id="setup-title">
+    Configura il servizio
+  </h2>
 
-      <p>
-        Attivale per ricevere automaticamente
-        il menu e gli aggiornamenti settimanali.
-      </p>
+  <p id="setup-intro">
+    Attiva le notifiche per ricevere il menu scolastico
+    e gli aggiornamenti sulle cene della settimana.
+    Ci vuole circa un minuto.
+  </p>
 
 
-      <div id="ios-help">
+  <!-- ISTRUZIONI IPHONE -->
 
-        <div style="font-weight:700; margin-bottom:6px;">
-          🍎 iPhone/iPad
-        </div>
+  <div id="ios-help">
 
-        <div style="margin-bottom:10px;">
-          Le notifiche funzionano
-          <b>solo se installi l’app</b>
-          sulla schermata Home.
-        </div>
+    <div class="setup-device-title">
+      🍎 Stai usando un iPhone o iPad
+    </div>
 
-        <ol style="margin:0; padding-left:18px;">
-          <li>
-            Apri questa pagina in <b>Safari</b>
-          </li>
+    <p>
+      Per ricevere le notifiche devi prima aggiungere
+      questa app alla schermata Home.
+    </p>
 
-          <li>
-            Tocca <b>Condividi</b>
-            (quadrato con freccia)
-          </li>
-
-          <li>
-            Seleziona
-            <b>Aggiungi alla schermata Home</b>
-          </li>
-
-          <li>
-            Apri l’app dall’icona
-            e attiva le notifiche
-          </li>
-        </ol>
-
+    <div class="setup-step">
+      <span>1</span>
+      <div>
+        Apri questa pagina con <strong>Safari</strong>.
       </div>
+    </div>
+
+    <div class="setup-step">
+      <span>2</span>
+      <div>
+        Tocca <strong>Condividi</strong>
+        <small>il quadrato con la freccia verso l'alto</small>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <span>3</span>
+      <div>
+        Scegli <strong>Aggiungi alla schermata Home</strong>.
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <span>4</span>
+      <div>
+        Apri <strong>Menu scuola e cena</strong>
+        dalla nuova icona.
+      </div>
+    </div>
+
+    <div class="setup-tip">
+      💡 Una volta aperta dalla Home potrai attivare
+      le notifiche.
+    </div>
+
+  </div>
 
 
-      <div id="push-status"></div>
+  <!-- STATO -->
+
+  <div id="push-status"></div>
 
 
-      <button id="btn-enable">
-        Attiva notifiche
-      </button>
+  <!-- PULSANTE -->
 
-    </section>
+  <button id="btn-enable">
+    🔔 Attiva notifiche
+  </button>
+
+
+  <!-- CONFERMA -->
+
+  <div id="setup-complete" style="display:none;">
+
+    <div class="setup-complete-icon">
+      ✓
+    </div>
+
+    <strong>Tutto pronto!</strong>
+
+    <div>
+      Le notifiche sono attive su questo dispositivo.
+    </div>
+
+  </div>
+
+</section>
+
 
 
     <pre id="out"></pre>
