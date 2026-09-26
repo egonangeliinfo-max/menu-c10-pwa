@@ -902,9 +902,7 @@ function setShoppingOpen(open, scrollToList = false) {
  * week.html#spesa:
  * apre la lista e scorre fino alla spesa.
  */
-if (window.location.hash === "#spesa") {
-  setShoppingOpen(true, true);
-}
+
 
 
 /*
@@ -926,7 +924,42 @@ shoppingToggle?.addEventListener(
 );
 
 
-loadWeek();
+loadWeek().then(() => {
+
+  if (window.location.hash === "#spesa") {
+
+    setShoppingOpen(true);
+
+    /*
+     * Il piano è stato caricato.
+     * Aspettiamo che il browser completi
+     * il rendering e poi scorriamo.
+     */
+    requestAnimationFrame(() => {
+
+      requestAnimationFrame(() => {
+
+        const shoppingCard =
+          document.querySelector(
+            ".shopping-card"
+          );
+
+        if (shoppingCard) {
+
+          shoppingCard.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+
+        }
+
+      });
+
+    });
+
+  }
+
+});
 </script>
 
 </body>
