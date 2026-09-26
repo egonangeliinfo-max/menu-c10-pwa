@@ -851,8 +851,11 @@ const shoppingList =
   document.getElementById("shoppingList");
 
 
-function setShoppingOpen(open) {
-  if (!shoppingList || !shoppingToggle) return;
+function setShoppingOpen(open, scrollToList = false) {
+
+  if (!shoppingList || !shoppingToggle) {
+    return;
+  }
 
   shoppingList.classList.toggle(
     "hidden",
@@ -864,33 +867,50 @@ function setShoppingOpen(open) {
       ? "🛒 Nascondi lista della spesa"
       : "🛒 Mostra lista della spesa";
 
-/*
- * Se arriviamo dalla home tramite
- * week.html#spesa, apriamo subito
- * la lista della spesa.
- */
 
-if (window.location.hash === "#spesa") {
+  /*
+   * Se richiesto, porta lo schermo
+   * direttamente alla lista della spesa.
+   */
+  if (open && scrollToList) {
 
-  // Apre la lista della spesa
-  setShoppingOpen(true);
+    requestAnimationFrame(() => {
 
-  // Porta lo schermo direttamente
-  // alla sezione della lista della spesa
-  setTimeout(() => {
+      const shoppingCard =
+        document.querySelector(
+          ".shopping-card"
+        );
 
-    const shoppingCard =
-      document.querySelector(".shopping-card");
+      if (shoppingCard) {
 
-    if (shoppingCard) {
-      shoppingCard.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }
+        shoppingCard.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
 
-  }, 150);
+      }
+
+    });
+
+  }
+
 }
+
+
+/*
+ * Se arriviamo dalla Home tramite
+ * week.html#spesa:
+ * apre la lista e scorre fino alla spesa.
+ */
+if (window.location.hash === "#spesa") {
+  setShoppingOpen(true, true);
+}
+
+
+/*
+ * Apertura/chiusura manuale
+ * della lista della spesa.
+ */
 shoppingToggle?.addEventListener(
   "click",
   () => {
@@ -901,11 +921,12 @@ shoppingToggle?.addEventListener(
       );
 
     setShoppingOpen(!isOpen);
+
   }
 );
 
-loadWeek();
 
+loadWeek();
 </script>
 
 </body>
