@@ -759,93 +759,35 @@ function setupWeekNavigation(plan) {
 }
 
   
-  async function loadWeek() {
+loadWeek().then(() => {
 
-  const content =
-    document.getElementById("content");
+  if (window.location.hash === "#spesa") {
 
-  const weekLabel =
-    document.getElementById("weekLabel");
+    // Apre la lista
+    setShoppingOpen(true);
 
-  try {
+    /*
+     * Forziamo nuovamente l'ancora
+     * dopo che il piano è stato costruito.
+     */
+    const target =
+      document.getElementById("spesa");
 
-const requestedWeek =
-  getRequestedWeek();
-console.log(
-  "Settimana richiesta al Worker:",
-  requestedWeek
-);
-const response =
-  await fetch(
-    WORKER_URL +
-    "/weekly-plan?sourceId=c10&week=" +
-    encodeURIComponent(requestedWeek)
-  );
+    if (target) {
 
-    if (!response.ok) {
-      throw new Error(
-        "Piano settimanale non disponibile"
-      );
+      setTimeout(() => {
+        target.scrollIntoView({
+          behavior: "auto",
+          block: "start"
+        });
+      }, 300);
+
     }
 
-    const json =
-      await response.json();
-
-    if (
-      !json.ok ||
-      !json.plan ||
-      !Array.isArray(json.plan.days)
-    ) {
-      throw new Error(
-        "Dati settimanali non validi"
-      );
-    }
-
-    const plan =
-      json.plan;
-    setupWeekNavigation(plan);
-renderShoppingList(
-  plan.shoppingList || {},
-  plan.week
-);
-
-    weekLabel.textContent =
-      "📅 " +
-      formatWeek(plan.days);
-
-
-    content.innerHTML = "";
-
-
-    plan.days.forEach((day) => {
-
-      content.appendChild(
-        createDayCard(day)
-      );
-
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    content.innerHTML = "";
-
-    const status =
-      document.createElement("div");
-
-    status.className =
-      "status";
-
-    status.textContent =
-      "Il piano delle cene non è ancora disponibile.";
-
-    content.appendChild(status);
-
-    weekLabel.textContent =
-      "📅 Settimana non disponibile";
   }
-}
+
+});
+  
 const shoppingToggle =
   document.getElementById("shoppingToggle");
 
