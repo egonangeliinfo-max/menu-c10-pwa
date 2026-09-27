@@ -757,36 +757,6 @@ function setupWeekNavigation(plan) {
 
   }
 }
-
-  
-loadWeek().then(() => {
-
-  if (window.location.hash === "#spesa") {
-
-    // Apre la lista
-    setShoppingOpen(true);
-
-    /*
-     * Forziamo nuovamente l'ancora
-     * dopo che il piano è stato costruito.
-     */
-    const target =
-      document.getElementById("spesa");
-
-    if (target) {
-
-      setTimeout(() => {
-        target.scrollIntoView({
-          behavior: "auto",
-          block: "start"
-        });
-      }, 300);
-
-    }
-
-  }
-
-});
   
 const shoppingToggle =
   document.getElementById("shoppingToggle");
