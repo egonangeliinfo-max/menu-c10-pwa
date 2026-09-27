@@ -795,6 +795,100 @@ const shoppingList =
   document.getElementById("shoppingList");
 
 
+ async function loadWeek() {
+
+  const content =
+    document.getElementById("content");
+
+  const weekLabel =
+    document.getElementById("weekLabel");
+
+  try {
+
+const requestedWeek =
+  getRequestedWeek();
+console.log(
+  "Settimana richiesta al Worker:",
+  requestedWeek
+);
+const response =
+  await fetch(
+    WORKER_URL +
+    "/weekly-plan?sourceId=c10&week=" +
+    encodeURIComponent(requestedWeek)
+  );
+
+    if (!response.ok) {
+      throw new Error(
+        "Piano settimanale non disponibile"
+      );
+    }
+
+    const json =
+      await response.json();
+
+    if (
+      !json.ok ||
+      !json.plan ||
+      !Array.isArray(json.plan.days)
+    ) {
+      throw new Error(
+        "Dati settimanali non validi"
+      );
+    }
+
+    const plan =
+      json.plan;
+    setupWeekNavigation(plan);
+renderShoppingList(
+  plan.shoppingList || {},
+  plan.week
+);
+
+    weekLabel.textContent =
+      "📅 " +
+      formatWeek(plan.days);
+
+
+    content.innerHTML = "";
+
+
+    plan.days.forEach((day) => {
+
+      content.appendChild(
+        createDayCard(day)
+      );
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    content.innerHTML = "";
+
+    const status =
+      document.createElement("div");
+
+    status.className =
+      "status";
+
+    status.textContent =
+      "Il piano delle cene non è ancora disponibile.";
+
+    content.appendChild(status);
+
+    weekLabel.textContent =
+      "📅 Settimana non disponibile";
+  }
+}
+const shoppingToggle =
+  document.getElementById("shoppingToggle");
+
+const shoppingList =
+  document.getElementById("shoppingList");
+
+
 function setShoppingOpen(open) {
 
   if (!shoppingList || !shoppingToggle) {
@@ -811,14 +905,6 @@ function setShoppingOpen(open) {
       ? "🛒 Nascondi lista della spesa"
       : "🛒 Mostra lista della spesa";
 }
-
-
-/*
- * Se arriviamo dalla Home tramite
- * week.html#spesa:
- * apre la lista e scorre fino alla spesa.
- */
-
 
 
 /*
@@ -839,16 +925,10 @@ shoppingToggle?.addEventListener(
   }
 );
 
+
 /*
- * Se arriviamo dalla Home tramite #spesa,
- * apriamo la lista.
- * NON tocchiamo loadWeek().
+ * Carica normalmente il piano settimanale.
  */
-if (window.location.hash === "#spesa") {
-  setShoppingOpen(true);
-}
-
-
 loadWeek();
 
 </script>
