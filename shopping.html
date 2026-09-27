@@ -335,7 +335,12 @@ const categoryNames = {
 };
 
 
-function createShoppingItem(item) {
+function createShoppingItem(
+  item,
+  category,
+  checkedItems,
+  storageKey
+) {
 
   const row =
     document.createElement("div");
@@ -357,6 +362,19 @@ function createShoppingItem(item) {
     "aria-label",
     "Segna come acquistato"
   );
+
+
+  const itemKey =
+    `${category}|${item.name}|${item.unit}`;
+
+
+  /*
+   * Recupera lo stato eventualmente
+   * salvato da week.html o shopping.html.
+   */
+  if (checkedItems[itemKey] === true) {
+    row.classList.add("checked");
+  }
 
 
   const content =
@@ -402,9 +420,21 @@ function createShoppingItem(item) {
   check.addEventListener(
     "click",
     () => {
-      row.classList.toggle(
-        "checked"
+
+      const checked =
+        row.classList.toggle("checked");
+
+      if (checked) {
+        checkedItems[itemKey] = true;
+      } else {
+        delete checkedItems[itemKey];
+      }
+
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify(checkedItems)
       );
+
     }
   );
 
@@ -416,7 +446,7 @@ function createShoppingItem(item) {
 }
 
 
-function renderShoppingList(shoppingList) {
+function renderShoppingList(shoppingList, week) {
 
   const content =
     document.getElementById(
@@ -425,6 +455,20 @@ function renderShoppingList(shoppingList) {
 
   content.innerHTML = "";
 
+  const storageKey =
+  `shopping-checked-${week}`;
+
+let checkedItems = {};
+
+try {
+  checkedItems =
+    JSON.parse(
+      localStorage.getItem(storageKey)
+    ) || {};
+} catch {
+  checkedItems = {};
+}
+  
   let itemsFound = 0;
 
 
@@ -476,7 +520,12 @@ function renderShoppingList(shoppingList) {
       items.forEach(
         (item) => {
           section.appendChild(
-            createShoppingItem(item)
+            createShoppingItem(
+  item,
+  key,
+  checkedItems,
+  storageKey
+)
           );
         }
       );
@@ -567,8 +616,9 @@ async function loadShoppingList() {
 
 
     renderShoppingList(
-      json.plan.shoppingList || {}
-    );
+  json.plan.shoppingList || {},
+  json.plan.week
+);
 
   }
 
