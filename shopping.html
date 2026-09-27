@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Lista della spesa</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family:
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      margin: 0;
+      padding: 20px;
+      line-height: 1.35;
+      background: #f6f6f6;
+      color: #222;
+    }
+
+    .card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+
+    .sub {
+      color: #666;
+      margin: 0 0 20px;
+      font-size: 14px;
+    }
+
+    .category {
+      margin-top: 22px;
+    }
+
+    .category:first-of-type {
+      margin-top: 10px;
+    }
+
+    .category-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .shopping-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #f2f2f2;
+    }
+
+    .shopping-item:last-child {
+      border-bottom: 0;
+    }
+
+    .check {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      border: 2px solid #bbb;
+      border-radius: 6px;
+      margin-top: 1px;
+      cursor: pointer;
+      background: white;
+    }
+
+    .shopping-item.checked {
+      opacity: 0.45;
+    }
+
+    .shopping-item.checked .item-name {
+      text-decoration: line-through;
+    }
+
+    .shopping-item.checked .check {
+      background: #ddd;
+    }
+
+    .item-content {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: 600;
+    }
+
+    .item-qty {
+      color: #666;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .status {
+      padding: 18px 0;
+      color: #666;
+      text-align: center;
+    }
+
+    .btnrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid #eee;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      text-decoration: none;
+      color: inherit;
+      background: white;
+    }
+
+    .footer {
+      max-width: 720px;
+      margin: 18px auto 0;
+      text-align: center;
+      color: #999;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <h1>🛒 Lista della spesa</h1>
+
+    <p
+      class="sub"
+      id="weekLabel"
+    >
+      📅 Caricamento settimana…
+    </p>
+
+    <div id="content">
+      <div class="status">
+        Caricamento lista della spesa…
+      </div>
+    </div>
+
+    <div class="btnrow">
+
+      <a
+        class="btn"
+        href="./week.html"
+      >
+        🍽️ Cene della settimana
+      </a>
+
+      <a
+        class="btn"
+        href="./"
+      >
+        🏠 Home
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="footer">
+    🧪 Versione di prova ·
+    Progetto sperimentale ideato da
+    <strong>Egon Angeli</strong>
+  </div>
+
+
+<script>
+
+const WORKER_URL =
+  "https://menu-push-c10.egon-angeli-info.workers.dev";
+
+
+function dateToKey(date) {
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+function getMonday(offsetWeeks = 0) {
+
+  const now =
+    new Date();
+
+  const date =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+  const day =
+    date.getDay();
+
+  const diff =
+    day === 0
+      ? -6
+      : 1 - day;
+
+  date.setDate(
+    date.getDate() +
+    diff +
+    (offsetWeeks * 7)
+  );
+
+  return dateToKey(date);
+}
+
+
+function getRequestedWeek() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const weekFromUrl =
+    params.get("week");
+
+  if (weekFromUrl) {
+    return weekFromUrl;
+  }
+
+  /*
+   * Da giovedì a domenica:
+   * pianificazione della settimana successiva.
+   *
+   * Da lunedì a mercoledì:
+   * settimana corrente.
+   */
+  const today =
+    new Date().getDay();
+
+  const offsetWeeks =
+    today >= 4 || today === 0
+      ? 1
+      : 0;
+
+  return getMonday(offsetWeeks);
+}
+
+
+function formatWeekKey(weekKey) {
+
+  const parts =
+    weekKey.split("-");
+
+  if (parts.length !== 3) {
+    return weekKey;
+  }
+
+  const date =
+    new Date(
+      Number(parts[0]),
+      Number(parts[1]) - 1,
+      Number(parts[2])
+    );
+
+  const end =
+    new Date(date);
+
+  end.setDate(
+    end.getDate() + 4
+  );
+
+  const formatter =
+    new Intl.DateTimeFormat(
+      "it-IT",
+      {
+        day: "numeric",
+        month: "long"
+      }
+    );
+
+  const startText =
+    formatter.format(date);
+
+  const endText =
+    formatter.format(end);
+
+  return `${startText} – ${endText}`;
+}
+
+
+const categoryNames = {
+  proteine: "🥩 Proteine",
+  cereali: "🍞 Cereali e carboidrati",
+  verdura: "🥕 Verdura",
+  latticini: "🧀 Latticini",
+  dispensa: "🫙 Dispensa"
+};
+
+
+function createShoppingItem(item) {
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "shopping-item";
+
+
+  const check =
+    document.createElement("button");
+
+  check.className =
+    "check";
+
+  check.type =
+    "button";
+
+  check.setAttribute(
+    "aria-label",
+    "Segna come acquistato"
+  );
+
+
+  const content =
+    document.createElement("div");
+
+  content.className =
+    "item-content";
+
+
+  const name =
+    document.createElement("div");
+
+  name.className =
+    "item-name";
+
+  name.textContent =
+    item.name || "Ingrediente";
+
+
+  const qty =
+    document.createElement("div");
+
+  qty.className =
+    "item-qty";
+
+  const quantity =
+    item.qty ?? "";
+
+  const unit =
+    item.unit ?? "";
+
+  qty.textContent =
+    `${quantity} ${unit}`.trim();
+
+
+  content.appendChild(name);
+
+  if (qty.textContent) {
+    content.appendChild(qty);
+  }
+
+
+  check.addEventListener(
+    "click",
+    () => {
+      row.classList.toggle(
+        "checked"
+      );
+    }
+  );
+
+
+  row.appendChild(check);
+  row.appendChild(content);
+
+  return row;
+}
+
+
+function renderShoppingList(shoppingList) {
+
+  const content =
+    document.getElementById(
+      "content"
+    );
+
+  content.innerHTML = "";
+
+  let itemsFound = 0;
+
+
+  Object.entries(
+    categoryNames
+  ).forEach(
+    ([key, title]) => {
+
+      const items =
+        shoppingList[key];
+
+      if (
+        !Array.isArray(items) ||
+        !items.length
+      ) {
+        return;
+      }
+
+      itemsFound +=
+        items.length;
+
+
+      const section =
+        document.createElement(
+          "section"
+        );
+
+      section.className =
+        "category";
+
+
+      const heading =
+        document.createElement(
+          "div"
+        );
+
+      heading.className =
+        "category-title";
+
+      heading.textContent =
+        title;
+
+
+      section.appendChild(
+        heading
+      );
+
+
+      items.forEach(
+        (item) => {
+          section.appendChild(
+            createShoppingItem(item)
+          );
+        }
+      );
+
+
+      content.appendChild(
+        section
+      );
+
+    }
+  );
+
+
+  if (!itemsFound) {
+
+    const status =
+      document.createElement(
+        "div"
+      );
+
+    status.className =
+      "status";
+
+    status.textContent =
+      "La lista della spesa non è ancora disponibile.";
+
+    content.appendChild(
+      status
+    );
+  }
+}
+
+
+async function loadShoppingList() {
+
+  const content =
+    document.getElementById(
+      "content"
+    );
+
+  const weekLabel =
+    document.getElementById(
+      "weekLabel"
+    );
+
+  try {
+
+    const requestedWeek =
+      getRequestedWeek();
+
+
+    const response =
+      await fetch(
+        WORKER_URL +
+        "/weekly-plan?sourceId=c10&week=" +
+        encodeURIComponent(
+          requestedWeek
+        )
+      );
+
+
+    if (!response.ok) {
+      throw new Error(
+        "Piano settimanale non disponibile"
+      );
+    }
+
+
+    const json =
+      await response.json();
+
+
+    if (
+      !json.ok ||
+      !json.plan
+    ) {
+      throw new Error(
+        "Dati settimanali non validi"
+      );
+    }
+
+
+    weekLabel.textContent =
+      "📅 " +
+      formatWeekKey(
+        json.plan.week
+      );
+
+
+    renderShoppingList(
+      json.plan.shoppingList || {}
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    weekLabel.textContent =
+      "📅 Settimana non disponibile";
+
+    content.innerHTML = "";
+
+    const status =
+      document.createElement(
+        "div"
+      );
+
+    status.className =
+      "status";
+
+    status.textContent =
+      "La lista della spesa non è ancora disponibile.";
+
+    content.appendChild(
+      status
+    );
+  }
+}
+
+
+loadShoppingList();
+
+</script>
+
+</body>
+</html>
