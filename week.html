@@ -839,43 +839,18 @@ shoppingToggle?.addEventListener(
   }
 );
 
+/*
+ * Se arriviamo dalla Home tramite #spesa,
+ * apriamo la lista.
+ * NON tocchiamo loadWeek().
+ */
+if (window.location.hash === "#spesa") {
+  setShoppingOpen(true);
+}
 
-loadWeek().then(() => {
 
-  if (window.location.hash === "#spesa") {
+loadWeek();
 
-    setShoppingOpen(true);
-
-    /*
-     * Il piano è stato caricato.
-     * Aspettiamo che il browser completi
-     * il rendering e poi scorriamo.
-     */
-    requestAnimationFrame(() => {
-
-      requestAnimationFrame(() => {
-
-        const shoppingCard =
-          document.querySelector(
-            ".shopping-card"
-          );
-
-        if (shoppingCard) {
-
-          shoppingCard.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-
-        }
-
-      });
-
-    });
-
-  }
-
-});
 </script>
 
 </body>
