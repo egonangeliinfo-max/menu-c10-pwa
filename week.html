@@ -722,39 +722,92 @@ function getRequestedWeek() {
       window.location.search
     );
 
-  return (
-    params.get("week") ||
-    getMonday(0)
+  /*
+   * Se la settimana è indicata nell'URL,
+   * rispettiamo sempre quella.
+   */
+  const weekFromUrl =
+    params.get("week");
+
+  if (weekFromUrl) {
+    return weekFromUrl;
+  }
+
+
+  const now =
+    new Date();
+
+  const day =
+    now.getDay();
+
+  const hour =
+    now.getHours();
+
+
+  /*
+   * Modalità settimana entrante:
+   *
+   * - venerdì dalle 18:00
+   * - sabato
+   * - domenica
+   */
+  const upcomingWeek =
+    (day === 5 && hour >= 18) ||
+    day === 6 ||
+    day === 0;
+
+
+  return getMonday(
+    upcomingWeek ? 1 : 0
   );
 }
 
 
 function setupWeekNavigation(plan) {
 
-  const currentWeek = getMonday(0);
-  const nextWeek = getMonday(1);
+  const currentWeek =
+    getMonday(0);
+
+  const nextWeek =
+    getMonday(1);
 
   const button =
-    document.getElementById("weekSwitchBtn");
+    document.getElementById(
+      "weekSwitchBtn"
+    );
 
-  if (!button || !plan) return;
+  if (!button || !plan) {
+    return;
+  }
 
-  // Ci basiamo sulla settimana realmente caricata dal Worker
-  if (plan.week === currentWeek) {
+
+  /*
+   * Se stiamo guardando la settimana
+   * entrante, permettiamo di tornare
+   * alla settimana appena conclusa/corrente.
+   */
+  if (plan.week === nextWeek) {
+
+    button.href =
+      `./week.html?week=${currentWeek}`;
+
+    button.textContent =
+      "← 📅 Guarda la settimana appena conclusa";
+
+  }
+
+  /*
+   * Se stiamo guardando la settimana
+   * corrente, permettiamo di vedere
+   * quella successiva.
+   */
+  else {
 
     button.href =
       `./week.html?week=${nextWeek}`;
 
     button.textContent =
       "📅 Guarda la prossima settimana →";
-
-  } else {
-
-    button.href =
-      `./week.html?week=${currentWeek}`;
-
-    button.textContent =
-      "← Torna a questa settimana 📅";
 
   }
 }
