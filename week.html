@@ -870,33 +870,6 @@ function setShoppingOpen(open) {
       : "🛒 Mostra lista della spesa";
 }
 
-  function scrollToShoppingFromHash() {
-
-  if (window.location.hash !== "#spesa") {
-    return;
-  }
-
-  // Apre la lista
-  setShoppingOpen(true);
-
-  const shoppingCard =
-    document.querySelector(".shopping-card");
-
-  if (!shoppingCard) {
-    return;
-  }
-
-  // Lo scroll non interferisce con il caricamento del piano
-  setTimeout(() => {
-
-    shoppingCard.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  }, 500);
-}
-
 /*
  * Apertura/chiusura manuale
  * della lista della spesa.
@@ -920,10 +893,7 @@ shoppingToggle?.addEventListener(
  * Carica normalmente il piano settimanale.
  */
 loadWeek();
-window.addEventListener(
-  "load",
-  scrollToShoppingFromHash
-);
+
 </script>
 
 </body>
