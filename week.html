@@ -558,20 +558,20 @@ container.appendChild(note);
   const normalized =
     normalizeShoppingList(shoppingList);
 
-  const categoryInfo = {
-    verdura: "🥦 Verdura",
-    proteine: "🥩 Proteine",
-    cereali: "🍝 Pane, pasta e cereali",
-    latticini: "🧀 Latticini",
-    dispensa: "🧂 Dispensa"
-  };
+const categoryInfo = {
+  proteine: "🥩 Proteine",
+  cereali: "🍞 Cereali e carboidrati",
+  verdura: "🥕 Verdura",
+  latticini: "🧀 Latticini",
+  dispensa: "🫙 Dispensa"
+};
 
   for (const category of [
-    "verdura",
-    "proteine",
-    "cereali",
-    "latticini",
-    "dispensa"
+  "proteine",
+  "cereali",
+  "verdura",
+  "latticini",
+  "dispensa"
   ]) {
 
     const items =
@@ -675,6 +675,7 @@ if (checkbox.checked) {
     container.appendChild(section);
   }
 }
+  
 function dateToKey(date) {
   const year = date.getFullYear();
   const month =
