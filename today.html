@@ -542,7 +542,110 @@ function formatDinnerValue(value) {
     );
 }
   async function loadMenu() {
+  /*
+   * ========================================
+   * SABATO E DOMENICA
+   * ========================================
+   *
+   * Nel weekend non mostriamo come "menu di oggi"
+   * l'ultimo menu scolastico disponibile.
+   */
 
+  const today =
+    new Date().getDay();
+
+  const isSaturday =
+    today === 6;
+
+  const isSunday =
+    today === 0;
+
+
+  if (isSaturday || isSunday) {
+    const pageTitle =
+      document.getElementById("pageTitle");
+
+    if (pageTitle) {
+      pageTitle.textContent =
+        isSaturday
+          ? "🌤️ È weekend!"
+          : "🌤️ Buona domenica!";
+    }
+    const dateEl =
+      document.getElementById("date");
+
+    const ul =
+      document.getElementById("list");
+
+
+    if (dateEl) {
+
+      const formatter =
+        new Intl.DateTimeFormat(
+          "it-IT",
+          {
+            weekday: "long",
+            day: "numeric",
+            month: "long"
+          }
+        );
+
+      const formattedDate =
+        formatter.format(
+          new Date()
+        );
+
+      dateEl.textContent =
+        "📅 " +
+        formattedDate.charAt(0).toUpperCase() +
+        formattedDate.slice(1);
+    }
+
+
+    if (ul) {
+
+      ul.innerHTML = "";
+
+      const li =
+        document.createElement("li");
+
+      li.style.listStyle =
+        "none";
+
+      li.style.marginLeft =
+        "-18px";
+
+      if (isSaturday) {
+
+        li.innerHTML = `
+          <strong>🌤️ Buon weekend!</strong><br>
+          Oggi non c'è il pranzo scolastico.<br><br>
+          Puoi dare un'occhiata alle cene proposte
+          o preparare la spesa per i prossimi giorni.
+        `;
+
+      } else {
+
+        li.innerHTML = `
+          <strong>🌤️ Buona domenica!</strong><br>
+          Oggi non c'è il pranzo scolastico.<br><br>
+          È un buon momento per dare un'occhiata
+          alla settimana che sta per iniziare.
+        `;
+
+      }
+
+      ul.appendChild(li);
+    }
+
+
+    /*
+     * Fermiamo qui loadMenu():
+     * nel weekend non chiediamo /menu-today
+     * al Worker.
+     */
+    return;
+  }
     const params =
       new URLSearchParams(
         location.search
