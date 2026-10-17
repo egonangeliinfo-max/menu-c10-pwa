@@ -16,7 +16,7 @@ ul{padding-left:22px}li{margin:5px 0}.warn{background:#fff6df;padding:12px;borde
 <p class="muted">🧪 Versione 2 · anteprima isolata, non collegata agli invii</p>
 <h1>🍽️ Le tue cene, a modo tuo</h1>
 <p class="muted">Prova le sostituzioni degli ingredienti e lo scambio tra giorni. I pranzi sono esempi, non il menù Risto3 reale.</p>
-<section class="card"><h2>Preferenze della famiglia</h2>
+<section class="card" id="profile"><div class="row" style="justify-content:space-between"><h2>Profilo della famiglia</h2><button id="closeProfile" type="button">Salva e vai alle cene</button></div><p class="muted">Da compilare una sola volta. Potrai modificarlo quando vuoi.</p><label for="familyPeople">Persone a cena</label> <select id="familyPeople"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select><h3>Stile alimentare</h3><label><input type="radio" name="diet" value="onnivoro"> Onnivoro</label> <label><input type="radio" name="diet" value="vegetariano"> Vegetariano</label> <label><input type="radio" name="diet" value="vegano"> Vegano</label>
 <p class="muted">Seleziona fino a cinque ingredienti per gruppo. Le preferenze sono memorizzate solo in questo browser.</p>
 <h3>👎 Ingredienti poco graditi <span id="dislikedCount"></span></h3><div id="dislikedChoices" class="row"></div>
 <h3>👍 Ingredienti graditi <span id="likedCount"></span></h3><div id="likedChoices" class="row"></div>
@@ -28,9 +28,9 @@ ul{padding-left:22px}li{margin:5px 0}.warn{background:#fff6df;padding:12px;borde
 <p class="warn">Questa anteprima non possiede ancora dati verificati su allergeni, prodotti e contaminazioni. Se selezioni un'esigenza alimentare, le ricette saranno indicate come NON VERIFICATE e non verranno suggerite come sicure.</p>
 <p id="prefStatus" aria-live="polite"></p>
 <div class="row"><button id="clear">Azzera preferenze</button></div></section>
-<section class="card"><h2>Settimana di prova</h2><div id="days"></div></section>
+<div class="row"><button id="editProfile" type="button">⚙️ Modifica profilo famiglia</button></div><section class="card"><h2>Settimana di prova</h2><div id="days"></div></section>
 <section class="card"><h2>🛒 Lista della spesa</h2><label for="people">Persone </label><select id="people"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select><ul id="shopping"></ul></section>
-<p class="warn">Le quantità sono indicative e questa anteprima non verifica allergeni, contaminazioni o idoneità nutrizionale. Non utilizzare le esclusioni per gestire allergie o intolleranze.</p>
+<p class="warn">Le ricette sono proposte organizzative, non indicazioni mediche o garanzie di assenza di allergeni. Chi cucina è responsabile della scelta dei prodotti, della verifica delle etichette e della corretta preparazione. Le sostituzioni di questa anteprima non sono ancora validate.</p>
 </main><script>
 const dishes=[
 {id:"pasta-tonno",family:"pasta",name:"Pasta al tonno e pomodoro",items:[["pasta",320],["tonno",250],["passata di pomodoro",400]]},
@@ -49,9 +49,9 @@ const lunches=["Pasta al pomodoro e verdure","Riso con verdure","Minestra e form
 let selected=["pasta-tonno","riso-pollo","polpette-ceci","piadina-ricotta","pasta-ricotta"];
 const INGREDIENTS=["tonno","ceci","ricotta","lenticchie","pollo","zucchine","carote","spinaci","pomodoro","patate","riso","pasta","salmone","funghi","broccoli","piselli","uova","merluzzo"];
 const KEY="menu-c10-v2-preferences";
-let prefs={liked:[],disliked:[],celiac:false,lactose:false,milkAllergy:false};
-try {const p=JSON.parse(localStorage.getItem(KEY)||"{}");for(const k of ["liked","disliked"])if(Array.isArray(p[k]))prefs[k]=p[k].filter(v=>INGREDIENTS.includes(v)).slice(0,5);for(const k of ["celiac","lactose","milkAllergy"])prefs[k]=p[k]===true;}catch{}
-const hasMedical=()=>prefs.celiac||prefs.lactose||prefs.milkAllergy;
+let prefs={liked:[],disliked:[],celiac:false,lactose:false,milkAllergy:false,diet:"onnivoro",people:4,configured:false};
+try {const p=JSON.parse(localStorage.getItem(KEY)||"{}");for(const k of ["liked","disliked"])if(Array.isArray(p[k]))prefs[k]=p[k].filter(v=>INGREDIENTS.includes(v)).slice(0,5);for(const k of ["celiac","lactose","milkAllergy"])prefs[k]=p[k]===true;if(["onnivoro","vegetariano","vegano"].includes(p.diet))prefs.diet=p.diet;if(Number.isInteger(p.people)&&p.people>=1&&p.people<=10)prefs.people=p.people;prefs.configured=p.configured===true;}catch{}
+const hasMedical=()=>prefs.celiac||prefs.lactose||prefs.milkAllergy;const profile=document.getElementById("profile");function showProfile(show){profile.hidden=!show;document.getElementById("editProfile").hidden=show;}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
 function renderChoices(){
  for(const key of ["liked","disliked"]){
@@ -66,7 +66,7 @@ function renderChoices(){
    target.append(btn);
   });
  }
- for(const key of ["celiac","lactose","milkAllergy"])document.getElementById(key).checked=prefs[key];
+ for(const key of ["celiac","lactose","milkAllergy"])document.getElementById(key).checked=prefs[key];document.getElementById("familyPeople").value=String(prefs.people);document.querySelectorAll("input[name=diet]").forEach(x=>x.checked=x.value===prefs.diet);
 }
 function ingredientsOf(d){return d.items.map(i=>norm(i[0]));}
 function containsIngredient(d,term){return ingredientsOf(d).some(i=>i.split(/[^a-zàèéìòù]+/).includes(term));}
@@ -80,7 +80,7 @@ function adjust(){
 }
 
 const norm=x=>String(x).toLowerCase().trim();
-const allowed=d=>!avoid||!d.items.some(i=>norm(i[0]).split(/[^a-zàèéìòù]+/).includes(avoid));
+
 function draw(){
 const target=document.getElementById("days");target.replaceChildren();
 days.forEach((day,i)=>{
@@ -104,7 +104,7 @@ actions.append(change,swap);wrap.append(actions);target.append(wrap);
 });drawShopping();
 }
 function drawShopping(){
-const people=Number(document.getElementById("people").value);
+const people=Number(prefs.people);
 const sum=new Map();
 selected.forEach(id=>{const dish=dishes.find(d=>d.id===id);dish.items.forEach(([name,qty,unit="g"])=>{
 const key=name+"|"+unit;sum.set(key,(sum.get(key)||0)+qty*people/4)
@@ -114,8 +114,8 @@ const list=document.getElementById("shopping");list.replaceChildren();
 const [name,unit]=key.split("|");const li=document.createElement("li");li.textContent=name+" — "+Number(qty.toFixed(1))+" "+unit;list.append(li)
 });
 }
-document.getElementById("clear").onclick=()=>{prefs={liked:[],disliked:[],celiac:false,lactose:false,milkAllergy:false};save();renderChoices();draw();document.getElementById("prefStatus").textContent="Preferenze azzerate."};
+document.getElementById("clear").onclick=()=>{prefs={liked:[],disliked:[],celiac:false,lactose:false,milkAllergy:false,diet:"onnivoro",people:4,configured:false};save();renderChoices();draw();document.getElementById("prefStatus").textContent="Preferenze azzerate."};
 for(const key of ["celiac","lactose","milkAllergy"])document.getElementById(key).onchange=e=>{prefs[key]=e.target.checked;save();draw()};
-document.getElementById("people").onchange=drawShopping;
-renderChoices();adjust();
+document.getElementById("people").onchange=()=>{prefs.people=Number(document.getElementById("people").value);save();document.getElementById("familyPeople").value=String(prefs.people);drawShopping()};document.getElementById("familyPeople").onchange=e=>{prefs.people=Number(e.target.value);document.getElementById("people").value=String(prefs.people);save();drawShopping()};document.querySelectorAll("input[name=diet]").forEach(x=>x.onchange=()=>{prefs.diet=x.value;save();draw()});document.getElementById("closeProfile").onclick=()=>{prefs.configured=true;save();showProfile(false)};document.getElementById("editProfile").onclick=()=>showProfile(true);
+document.getElementById("people").value=String(Math.min(6,Math.max(2,prefs.people)));renderChoices();showProfile(!prefs.configured);adjust();
 </script></body></html>
