@@ -44,9 +44,36 @@ const dishes=[
 {id:"piadina-ricotta",family:"piadina",name:"Piadina con ricotta e spinaci",items:[["piadine",4,"pz"],["ricotta",450],["spinaci",500]]},
 {id:"piadina-ceci",family:"piadina",name:"Piadina con hummus e verdure",items:[["piadine",4,"pz"],["ceci",500],["carote",350]]}
 ];
+const EXTRA=[
+{id:"frittata-zucchine",family:"uova",name:"Frittata di zucchine con patate",items:[["uova",6,"pz"],["zucchine",450],["patate",650]]},
+{id:"zuppa-lenticchie",family:"zuppa",name:"Zuppa di lenticchie e verdure",items:[["lenticchie",500],["carote",300],["patate",400]]},
+{id:"insalata-ceci",family:"insalata",name:"Insalata tiepida di ceci e patate",items:[["ceci",500],["patate",650],["pomodoro",300]]},
+{id:"pollo-forno",family:"forno",name:"Pollo al forno con carote e patate",items:[["pollo",650],["carote",350],["patate",600]]},
+{id:"verdure-ripiene",family:"forno",name:"Zucchine ripiene di lenticchie",items:[["zucchine",700],["lenticchie",500],["passata di pomodoro",250]]}
+];
+dishes.push(...EXTRA);
+const PREP={
+"pasta":"Porta a bollore l’acqua e cuoci la pasta secondo le indicazioni sulla confezione. Nel frattempo prepara il condimento in padella, aggiungendo gli ingredienti indicati e un poco d’acqua se necessario. Unisci la pasta scolata e mescola.",
+"riso":"Cuoci il riso seguendo i tempi della confezione. Taglia le verdure e cuocile in padella con poco olio; aggiungi i ceci già cotti oppure il pollo e cuocilo completamente. Unisci il riso e amalgama.",
+"polpette":"Schiaccia o trita l’ingrediente principale già cotto, amalgama con pangrattato e aromi e forma le polpette. Cuoci in forno a 190 °C per circa 20–25 minuti, verificando la cottura completa. Prepara le patate come contorno.",
+"piadina":"Prepara il ripieno: cuoci le verdure e, se previsto, prepara la crema di ceci o utilizza la ricotta. Scalda le piadine secondo le indicazioni della confezione, farcisci e servi.",
+"uova":"Taglia le zucchine e cuocile in padella. Sbatti le uova, aggiungile alle zucchine e cuoci la frittata completamente. Accompagna con patate cotte.",
+"zuppa":"Taglia le verdure e falle insaporire con poco olio. Aggiungi le lenticchie già cotte e acqua o brodo quanto basta. Fai sobbollire circa 15–20 minuti.",
+"insalata":"Cuoci le patate a pezzi finché sono tenere. Mescola con i ceci già cotti e i pomodori tagliati, poi condisci a piacere.",
+"forno":"Prepara gli ingredienti indicati e disponili in una teglia con poco olio. Cuoci a 190 °C fino a cottura completa; per il pollo verifica la cottura al cuore, per le zucchine ripiene utilizza lenticchie già cotte."
+};
+const TIME={pasta:25,riso:30,polpette:35,piadina:15,uova:25,zuppa:30,insalata:25,forno:40};
+const ANIMAL=["pollo","tonno","salmone","merluzzo","carne"];
+const NONVEGAN=[...ANIMAL,"ricotta","mozzarella","formaggio","uova","latte","burro"];
+function dietAllowed(d){const banned=prefs.diet==="vegano"?NONVEGAN:prefs.diet==="vegetariano"?ANIMAL:[];return !d.items.some(i=>banned.some(b=>norm(i[0])===b))}
+function category(d){return d.family==="pasta"?"cereali":d.family==="riso"?"cereali":d.family==="piadina"?"cereali":d.family}
+function lunchCategory(i){const x=norm(lunches[i]);return x.includes("pasta")?"cereali":x.includes("riso")?"cereali":x.includes("formaggio")?"latticini":"altro"}
+function mealScore(d,i){let n=score(d);if(category(d)===lunchCategory(i))n-=9;if(selected.some((id,j)=>j!==i&&dishes.find(x=>x.id===id)?.family===d.family))n-=7;if(selected.some((id,j)=>j!==i&&id===d.id))n-=30;if(d.family==="piadina")n+=1;return n}
+
 const days=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì"];
 const lunches=["Pasta al pomodoro e verdure","Riso con verdure","Minestra e formaggio","Pasta al ragù","Riso e verdure"];
 let selected=["pasta-tonno","riso-pollo","polpette-ceci","piadina-ricotta","pasta-ricotta"];
+const rejectedByDay=Array.from({length:5},()=>new Set());
 const INGREDIENTS=["tonno","ceci","ricotta","lenticchie","pollo","zucchine","carote","spinaci","pomodoro","patate","riso","pasta","salmone","funghi","broccoli","piselli","uova","merluzzo"];
 const KEY="menu-c10-v2-preferences";
 let prefs={liked:[],disliked:[],celiac:false,lactose:false,milkAllergy:false,diet:"onnivoro",people:4,configured:false};
@@ -71,36 +98,38 @@ function renderChoices(){
 function ingredientsOf(d){return d.items.map(i=>norm(i[0]));}
 function containsIngredient(d,term){return ingredientsOf(d).some(i=>i.split(/[^a-zàèéìòù]+/).includes(term));}
 function score(d){return prefs.liked.reduce((n,i)=>n+(containsIngredient(d,i)?2:0),0)-prefs.disliked.reduce((n,i)=>n+(containsIngredient(d,i)?10:0),0)}
-function alternatives(current){return dishes.filter(d=>d.family===current.family&&d.id!==current.id).sort((a,b)=>score(b)-score(a)||a.name.localeCompare(b.name,"it"))}
+function alternatives(current,i){return dishes.filter(d=>d.id!==current.id&&dietAllowed(d)&&!rejectedByDay[i].has(d.id)).sort((a,b)=>mealScore(b,i)-mealScore(a,i)||a.name.localeCompare(b.name,"it"))}
 function adjust(){
- let changes=0;
- selected=selected.map(id=>{const current=dishes.find(d=>d.id===id);const best=[current,...alternatives(current)].sort((a,b)=>score(b)-score(a))[0];if(best.id!==id){changes++;return best.id;}return id});
- document.getElementById("prefStatus").textContent=changes?"Preferenze applicate: "+changes+" cene aggiornate.":"Preferenze aggiornate.";
- draw();
+let changes=0;
+selected=selected.map((id,i)=>{const current=dishes.find(d=>d.id===id);if(dietAllowed(current)&&mealScore(current,i)>=-7)return id;const candidate=alternatives(current,i)[0];if(candidate){changes++;return candidate.id}return id});
+document.getElementById("prefStatus").textContent=changes?changes+" cene aggiornate in base al profilo.":"Preferenze aggiornate.";draw();
 }
-
 const norm=x=>String(x).toLowerCase().trim();
 
 function draw(){
 const target=document.getElementById("days");target.replaceChildren();
 days.forEach((day,i)=>{
-const current=dishes.find(d=>d.id===selected[i]);
-const wrap=document.createElement("div");wrap.className="day";
+const current=dishes.find(d=>d.id===selected[i]);const wrap=document.createElement("div");wrap.className="day";
 const heading=document.createElement("strong");heading.textContent=day;wrap.append(heading);
 const lunch=document.createElement("small");lunch.textContent="Pranzo dimostrativo: "+lunches[i];wrap.append(lunch);
-const name=document.createElement("div");name.className="dish";name.textContent=current.name;wrap.append(name);if(hasMedical()){const warning=document.createElement("small");warning.textContent="⚠️ Compatibilità alimentare NON VERIFICATA: non considerare questa ricetta sicura.";wrap.append(warning)}
+const name=document.createElement("div");name.className="dish";name.textContent=current.name;wrap.append(name);
+const meta=document.createElement("small");meta.textContent="⏱ Circa "+TIME[current.family]+" minuti · "+current.family;wrap.append(meta);
+if(!dietAllowed(current)){const warning=document.createElement("p");warning.className="warn";warning.textContent="Questa proposta non rispetta lo stile alimentare selezionato: scegli un'altra cena.";wrap.append(warning)}
 const actions=document.createElement("div");actions.className="row";
-const change=document.createElement("button");change.textContent="🔄 Cambia variante";
-change.onclick=()=>{
-const opts=alternatives(current);
-if(!opts.length){alert("Non ci sono altre varianti compatibili in questa prova.");return}
-selected[i]=opts[0].id;draw();
-};
-const swap=document.createElement("select");swap.setAttribute("aria-label","Scambia la cena di "+day);
-const first=document.createElement("option");first.textContent="↔ Scambia con…";first.value="";swap.append(first);
-days.forEach((other,j)=>{if(i===j)return;const opt=document.createElement("option");opt.value=j;opt.textContent=other;swap.append(opt)});
-swap.onchange=()=>{if(swap.value==="")return;const j=Number(swap.value);[selected[i],selected[j]]=[selected[j],selected[i]];draw()};
-actions.append(change,swap);wrap.append(actions);target.append(wrap);
+const change=document.createElement("button");change.className="primary";change.textContent="🔄 Cambia cena";
+change.onclick=()=>{rejectedByDay[i].add(current.id);const options=alternatives(current,i);if(!options.length){rejectedByDay[i].delete(current.id);alert("Non ci sono altre proposte in questo catalogo dimostrativo.");return}selected[i]=options[0].id;draw()};
+const detail=document.createElement("button");detail.textContent="📖 Vedi ricetta";
+const recipe=document.createElement("div");recipe.hidden=true;
+detail.onclick=()=>{recipe.hidden=!recipe.hidden;detail.textContent=recipe.hidden?"📖 Vedi ricetta":"Chiudi ricetta"};
+const title=document.createElement("h4");title.textContent="Ingredienti per "+prefs.people+" persone";recipe.append(title);
+const ul=document.createElement("ul");current.items.forEach(([item,qty,unit="g"])=>{const li=document.createElement("li");li.textContent=item+": "+Number((qty*prefs.people/4).toFixed(1))+" "+unit;ul.append(li)});recipe.append(ul);
+const steps=document.createElement("p");steps.textContent=PREP[current.family];recipe.append(steps);
+const adapt=[];if(prefs.celiac)current.items.forEach(([item])=>{if(["pasta","piadine","pangrattato"].includes(norm(item)))adapt.push(item+": usare prodotto specifico senza glutine idoneo per celiaci")});
+if(prefs.lactose)current.items.forEach(([item])=>{if(["ricotta","mozzarella","latte"].includes(norm(item)))adapt.push(item+": utilizzare versione senza lattosio idonea")});
+if(prefs.milkAllergy)current.items.forEach(([item])=>{if(["ricotta","mozzarella","latte"].includes(norm(item)))adapt.push(item+": sostituire con alternativa senza proteine del latte, da verificare")});
+if(adapt.length){const p=document.createElement("p");p.textContent="🔄 Adattamenti suggeriti: "+adapt.join("; ");recipe.append(p)}
+if(hasMedical()){const caution=document.createElement("p");caution.className="warn";caution.textContent="Indicazioni non validate per allergie o celiachia: verificare tutti gli ingredienti, le etichette e la preparazione.";recipe.append(caution)}
+actions.append(change,detail);wrap.append(actions,recipe);target.append(wrap);
 });drawShopping();
 }
 function drawShopping(){
