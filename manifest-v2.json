@@ -1,8 +1,8 @@
 {
   "name": "Menu scuola e cene · V2",
   "short_name": "Menu cene V2",
-  "description": "Menu scolastico e cene personalizzate per la famiglia",
-  "start_url": "./famiglie-v2.html",
+  "description": "Home V2 con menu scolastico e cene personalizzate",
+  "start_url": "./v2-home.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#fffefa",
@@ -15,6 +15,6 @@
       "purpose": "any"
     }
   ],
-  "id": "./famiglie-v2.html",
+  "id": "./v2-home.html",
   "lang": "it"
 }
