@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prova cene personalizzate · V2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f6f5;color:#202923;font:16px system-ui,sans-serif;padding:16px}
+main{max-width:680px;margin:auto}h1{font-size:26px}h2{font-size:18px;margin:0 0 8px}
+.card{background:white;border:1px solid #e1e5e1;border-radius:17px;padding:17px;margin:12px 0}
+.muted{color:#657068;font-size:14px}button,select,input{font:inherit}button{background:white;border:1px solid #cbd4ce;border-radius:10px;padding:10px;cursor:pointer}
+button.primary{background:#246a4c;color:white;border-color:#246a4c}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.day{border-top:1px solid #e6e9e7;padding:14px 0}
+.day:first-child{border:0}.dish{font-size:18px;font-weight:700;margin:8px 0}
+input[type=text]{width:100%;padding:11px;border:1px solid #ccd3cd;border-radius:10px}
+small{display:block;color:#66736a}.pill{display:inline-block;background:#e9f2eb;border-radius:20px;padding:5px 9px;margin:4px;font-size:13px}
+ul{padding-left:22px}li{margin:5px 0}.warn{background:#fff6df;padding:12px;border-radius:10px;font-size:13px}
+</style></head><body><main>
+<p class="muted">🧪 Versione 2 · anteprima isolata, non collegata agli invii</p>
+<h1>🍽️ Le tue cene, a modo tuo</h1>
+<p class="muted">Prova le sostituzioni degli ingredienti e lo scambio tra giorni. I pranzi sono esempi, non il menù Risto3 reale.</p>
+<section class="card"><h2>Preferenze della famiglia</h2>
+<label for="avoid">Ingrediente non gradito</label>
+<input id="avoid" type="text" placeholder="Es. tonno, ricotta, ceci">
+<p class="muted">In questa prova puoi indicare un ingrediente alla volta. Le alternative che lo contengono vengono nascoste.</p>
+<div class="row"><button class="primary" id="apply">Applica preferenza</button><button id="clear">Azzera</button></div>
+<p id="prefStatus" aria-live="polite"></p></section>
+<section class="card"><h2>Settimana di prova</h2><div id="days"></div></section>
+<section class="card"><h2>🛒 Lista della spesa</h2><label for="people">Persone </label><select id="people"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select><ul id="shopping"></ul></section>
+<p class="warn">Le quantità sono indicative e questa anteprima non verifica allergeni, contaminazioni o idoneità nutrizionale. Non utilizzare le esclusioni per gestire allergie o intolleranze.</p>
+</main><script>
+const dishes=[
+{id:"pasta-tonno",family:"pasta",name:"Pasta al tonno e pomodoro",items:[["pasta",320],["tonno",250],["passata di pomodoro",400]]},
+{id:"pasta-ceci",family:"pasta",name:"Pasta con ceci e rosmarino",items:[["pasta",320],["ceci",480],["passata di pomodoro",300]]},
+{id:"pasta-ricotta",family:"pasta",name:"Pasta con ricotta e pomodoro",items:[["pasta",320],["ricotta",350],["passata di pomodoro",300]]},
+{id:"pasta-lenticchie",family:"pasta",name:"Pasta al ragù di lenticchie",items:[["pasta",320],["lenticchie",480],["passata di pomodoro",400]]},
+{id:"riso-pollo",family:"riso",name:"Riso con pollo e zucchine",items:[["riso",320],["pollo",550],["zucchine",500]]},
+{id:"riso-ceci",family:"riso",name:"Riso con ceci e carote",items:[["riso",320],["ceci",480],["carote",500]]},
+{id:"polpette-ceci",family:"polpette",name:"Polpette di ceci con patate",items:[["ceci",550],["patate",700],["pangrattato",80]]},
+{id:"polpette-pollo",family:"polpette",name:"Polpette di pollo con patate",items:[["pollo",550],["patate",700],["pangrattato",80]]},
+{id:"piadina-ricotta",family:"piadina",name:"Piadina con ricotta e spinaci",items:[["piadine",4,"pz"],["ricotta",450],["spinaci",500]]},
+{id:"piadina-ceci",family:"piadina",name:"Piadina con hummus e verdure",items:[["piadine",4,"pz"],["ceci",500],["carote",350]]}
+];
+const days=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì"];
+const lunches=["Pasta al pomodoro e verdure","Riso con verdure","Minestra e formaggio","Pasta al ragù","Riso e verdure"];
+let selected=["pasta-tonno","riso-pollo","polpette-ceci","piadina-ricotta","pasta-ricotta"];
+let avoid="";
+const norm=x=>String(x).toLowerCase().trim();
+const allowed=d=>!avoid||!d.items.some(i=>norm(i[0]).split(/[^a-zàèéìòù]+/).includes(avoid));
+function draw(){
+const target=document.getElementById("days");target.replaceChildren();
+days.forEach((day,i)=>{
+const current=dishes.find(d=>d.id===selected[i]);
+const wrap=document.createElement("div");wrap.className="day";
+const heading=document.createElement("strong");heading.textContent=day;wrap.append(heading);
+const lunch=document.createElement("small");lunch.textContent="Pranzo dimostrativo: "+lunches[i];wrap.append(lunch);
+const name=document.createElement("div");name.className="dish";name.textContent=current.name;wrap.append(name);
+const actions=document.createElement("div");actions.className="row";
+const change=document.createElement("button");change.textContent="🔄 Cambia variante";
+change.onclick=()=>{
+const opts=dishes.filter(d=>d.family===current.family&&allowed(d)&&d.id!==current.id);
+if(!opts.length){alert("Non ci sono altre varianti compatibili in questa prova.");return}
+selected[i]=opts[0].id;draw();
+};
+const swap=document.createElement("select");swap.setAttribute("aria-label","Scambia la cena di "+day);
+const first=document.createElement("option");first.textContent="↔ Scambia con…";first.value="";swap.append(first);
+days.forEach((other,j)=>{if(i===j)return;const opt=document.createElement("option");opt.value=j;opt.textContent=other;swap.append(opt)});
+swap.onchange=()=>{if(swap.value==="")return;const j=Number(swap.value);[selected[i],selected[j]]=[selected[j],selected[i]];draw()};
+actions.append(change,swap);wrap.append(actions);target.append(wrap);
+});drawShopping();
+}
+function drawShopping(){
+const people=Number(document.getElementById("people").value);
+const sum=new Map();
+selected.forEach(id=>{const dish=dishes.find(d=>d.id===id);dish.items.forEach(([name,qty,unit="g"])=>{
+const key=name+"|"+unit;sum.set(key,(sum.get(key)||0)+qty*people/4)
+})});
+const list=document.getElementById("shopping");list.replaceChildren();
+[...sum].sort((a,b)=>a[0].localeCompare(b[0],"it")).forEach(([key,qty])=>{
+const [name,unit]=key.split("|");const li=document.createElement("li");li.textContent=name+" — "+Number(qty.toFixed(1))+" "+unit;list.append(li)
+});
+}
+document.getElementById("apply").onclick=()=>{
+avoid=norm(document.getElementById("avoid").value);
+let changes=0;
+selected=selected.map(id=>{
+const current=dishes.find(d=>d.id===id);
+if(allowed(current))return id;
+const replacement=dishes.find(d=>d.family===current.family&&allowed(d));
+if(replacement){changes++;return replacement.id}return id;
+});
+document.getElementById("prefStatus").textContent=changes+" cena/e adattata/e. Le altre varianti disponibili rispettano la preferenza quando possibile.";
+draw();
+};
+document.getElementById("clear").onclick=()=>{avoid="";document.getElementById("avoid").value="";document.getElementById("prefStatus").textContent="Preferenza azzerata.";draw()};
+document.getElementById("people").onchange=drawShopping;
+draw();
+</script></body></html>
