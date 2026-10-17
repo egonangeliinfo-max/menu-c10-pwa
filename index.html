@@ -9,7 +9,7 @@
 (function(){
  try {
   if(localStorage.getItem("menu-c10-preferred-version")==="v2" && !location.hash && !new URLSearchParams(location.search).has("v1")) {
-   location.replace("./famiglie-v2.html");
+   location.replace("./v2-home.html");
   }
  }catch(e){console.warn("Preferenza versione non disponibile",e)}
 })();
