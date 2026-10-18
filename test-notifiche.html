@@ -11,7 +11,7 @@ a{color:#286a49}.muted{color:#5a6e5f;font-size:14px}#status{white-space:pre-wrap
 <p>Questa pagina crea notifiche <strong>soltanto su questo dispositivo</strong>. Non invia messaggi agli altri utenti e non modifica le iscrizioni push.</p>
 <section class="panel"><strong>Versione scelta su questo dispositivo</strong><p id="version">Verifica in corso…</p><p class="muted">Per provare entrambe le versioni, cambia la preferenza dall'app e torna qui.</p></section>
 <section class="panel"><h2>1. Notifica ordinaria</h2><p>Simula la notifica del menù scolastico. Il tocco dovrebbe aprire la Home della versione scelta.</p><button id="normal">Invia notifica di prova ordinaria</button></section>
-<section class="panel"><h2>2. Annuncio della V2</h2><p>Simula l'annuncio della nuova versione. Il tocco deve aprire la pagina di presentazione, senza attivare automaticamente la V2.</p><button id="launch">Invia notifica di prova lancio V2</button></section>
+<section class="panel"><h2>2. Annuncio della V2</h2><p>Simula l'annuncio della nuova versione. Il tocco deve aprire la pagina di presentazione, senza attivare automaticamente la V2.</p><button id="launch">Invia notifica di prova lancio della nuova versione</button></section>
 <section class="panel"><h2>Risultato</h2><p id="status" role="status" aria-live="polite">Nessun test eseguito.</p></section>
 <p class="muted">Il test usa la stessa API di visualizzazione delle notifiche e lo stesso service worker delle push reali, ma non testa la consegna dal server. Su alcuni dispositivi la notifica potrebbe non apparire quando l'app è aperta. Se necessario, torna alla schermata Home dopo aver premuto il pulsante.</p>
 </main><script>
@@ -30,7 +30,7 @@ async function test(kind){
   const reg=await navigator.serviceWorker.ready;
   if(!reg.showNotification)throw Error("La visualizzazione delle notifiche non è disponibile.");
   const launch=kind==="launch";
-  await reg.showNotification(launch?"🧪 TEST · Scopri la nuova V2":"🧪 TEST · Menù scolastico",{
+  await reg.showNotification(launch?"🧪 TEST · Scopri la nuova versione":"🧪 TEST · Menù scolastico",{
    body:launch?"Cene personalizzate, ricette e lista della spesa: scopri le novità.":"Tocca per verificare l'apertura della versione scelta.",
    tag:"menu-c10-test-"+kind,
    data:{url:launch?"./novita-v2.html":"./index.html"},
