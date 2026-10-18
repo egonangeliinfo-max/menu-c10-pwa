@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scopri la nuova versione · Menu scuola e cene</title>
+<link rel="icon" href="./icon-v2.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="theme-color" content="#f5f7f3">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7f3;color:#26362b;font:16px system-ui,-apple-system,sans-serif;line-height:1.55}
+main{max-width:720px;margin:auto;padding:25px 18px 50px}h1{font-size:clamp(27px,6vw,39px);line-height:1.15;margin:15px 0}h2{font-size:21px;margin:0 0 10px}.eyebrow{display:inline-block;padding:7px 12px;border-radius:20px;background:#dceee0;color:#286a49;font-weight:700;font-size:13px}
+.lead{font-size:18px;color:#4e6554}.hero{display:flex;align-items:center;gap:17px}.hero img{width:88px;height:88px;border-radius:22px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.card{background:#fff;border:1px solid #dce6dd;border-radius:16px;padding:17px}.card p{margin:7px 0 0;color:#536a59;font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0}.btn{display:inline-block;border-radius:12px;padding:14px 19px;text-decoration:none;font-weight:700;border:1px solid #2c7344;background:#2c7344;color:white;cursor:pointer;font:inherit}.btn.secondary{background:white;color:#2c7344}.note{font-size:14px;color:#596e60;padding:14px;background:#eaf1e9;border-radius:12px}footer{margin-top:30px;font-size:13px;color:#647568}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.hero img{width:70px;height:70px}}
+</style></head><body><main>
+<span class="eyebrow">🧪 Nuova versione in prova</span>
+<div class="hero"><div><h1>Le cene della settimana, più semplici da organizzare</h1></div><img src="./icon-v2.svg" alt="Icona Menu scuola e cene"></div>
+<p class="lead">Il menù scolastico che già conosci, con una novità: proposte per le cene della famiglia, ricette e lista della spesa.</p>
+<div class="grid">
+<section class="card"><h2>🏫 Pranzo e cena insieme</h2><p>Consulta il pranzo scolastico e scopri proposte per la cena che tengono conto dei pasti della settimana.</p></section>
+<section class="card"><h2>👨‍👩‍👧‍👦 Profilo famiglia</h2><p>Indica quante persone mangiano, lo stile alimentare, gli ingredienti graditi e quelli da escludere.</p></section>
+<section class="card"><h2>🔄 Cambia cena</h2><p>Non ti convince una proposta? Puoi sostituirla e consultare la ricetta con i passaggi di preparazione.</p></section>
+<section class="card"><h2>🛒 Lista della spesa</h2><p>Raccogli gli ingredienti delle cene suggerite con quantità indicative per la tua famiglia.</p></section>
+</div>
+<p class="note">La V2 è gratuita durante questa sperimentazione. Le proposte non sostituiscono il parere di un professionista: verifica sempre ingredienti, allergeni, etichette e porzioni. Le preferenze del profilo sono salvate sul dispositivo.</p>
+<div class="actions"><button class="btn" id="activate" type="button">🍽️ Prova la nuova versione</button><a class="btn secondary" href="./index.html?v1=1">Continua con la versione attuale</a></div>
+<p id="message" role="status" aria-live="polite"></p>
+<footer>Puoi tornare alla versione precedente quando vuoi dalle impostazioni della V2. Le notifiche scolastiche già attive non richiedono una nuova iscrizione.</footer>
+</main><script>
+document.getElementById("activate").addEventListener("click",function(){
+ try{localStorage.setItem("menu-c10-preferred-version","v2")}catch(e){document.getElementById("message").textContent="Non è stato possibile memorizzare la scelta: puoi comunque provare la nuova versione."}
+ location.href="./v2-home.html";
+});
+</script></body></html>
