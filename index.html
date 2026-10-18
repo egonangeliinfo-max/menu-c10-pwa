@@ -10,7 +10,9 @@
  try {
   const params=new URLSearchParams(location.search);
   const isV2=localStorage.getItem("menu-c10-preferred-version")==="v2";
-  if(isV2 && !location.hash && !params.has("v1")) {
+  if(params.get("from")==="push" && params.get("target")?.includes("novita-v2.html")) {
+   location.replace("./novita-v2.html");
+  } else if(isV2 && !location.hash && !params.has("v1")) {
    location.replace("./v2-home.html"+(params.get("from")==="push"?"?from=push":""));
   } else if(params.get("from")==="push" && params.has("target")) {
    const target=new URL(params.get("target"),location.origin);
