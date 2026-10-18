@@ -8,8 +8,13 @@
 <script>
 (function(){
  try {
-  if(localStorage.getItem("menu-c10-preferred-version")==="v2" && !location.hash && !new URLSearchParams(location.search).has("v1")) {
-   location.replace("./v2-home.html");
+  const params=new URLSearchParams(location.search);
+  const isV2=localStorage.getItem("menu-c10-preferred-version")==="v2";
+  if(isV2 && !location.hash && !params.has("v1")) {
+   location.replace("./v2-home.html"+(params.get("from")==="push"?"?from=push":""));
+  } else if(params.get("from")==="push" && params.has("target")) {
+   const target=new URL(params.get("target"),location.origin);
+   if(target.origin===location.origin && target.pathname.startsWith(new URL("./",location.href).pathname) && !target.pathname.endsWith("/index.html")) location.replace(target.href);
   }
  }catch(e){console.warn("Preferenza versione non disponibile",e)}
 })();
