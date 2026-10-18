@@ -106,6 +106,11 @@ function ingredientOverlap(r,other){
  const common=vegetableGroups(r).filter(x=>vegetableGroups(other).includes(x));
  return common.length;
 }
+function foodKeys(r){
+ const t=r.items.map(x=>norm(x[0])).join(" ");
+ const keys=["patate","ceci","lenticchie","fagioli","piselli","tonno","merluzzo","pollo","uova","ricotta","riso","pasta"];
+ return keys.filter(k=>new RegExp(k==="patate"?"patat":k==="ceci"?"cec":k==="uova"?"uov":k==="fagioli"?"fagiol":k).test(t));
+}
 function score(r,i,selectedMap=chosen){
  let value=0;const lunch=lunchFeatures(plan.days[i]);
  if(lunch.proteins.has(r.protein))value-=15;
@@ -121,6 +126,7 @@ function score(r,i,selectedMap=chosen){
   if(other.id===r.id)value-=100;
   if(other.family===r.family)value-=12;
   if(other.protein===r.protein)value-=8;
+  for(const key of foodKeys(r))if(foodKeys(other).includes(key))value-=Math.abs(Number(day)-i)===1?28:12;
   if(Math.abs(Number(day)-i)===1&&other.protein==="uova"&&r.protein==="uova")value-=35;
   for(const g of vegetables)if(vegetableGroups(other).includes(g)){
    counts[g]++;
@@ -140,6 +146,20 @@ function weeklyQuality(map){
  for(const [day,id] of Object.entries(map)){
   const r=R.find(x=>x.id===id);if(r)total+=score(r,Number(day),map);
  }
+ const counts={};const families={};
+ for(const id of Object.values(map)){
+  const r=R.find(x=>x.id===id);if(!r)continue;
+  counts[r.protein]=(counts[r.protein]||0)+1;
+  families[r.family]=(families[r.family]||0)+1;
+ }
+ const school={};
+ for(const day of plan.days)for(const group of lunchFeatures(day).proteins)school[group]=(school[group]||0)+1;
+ if((counts.legumi||0)+(school.legumi||0)<2)total-=25;
+ if(!(counts.legumi||0))total-=20;
+ if(p.diet==="onnivoro"&&!(counts.pesce||0)&&!(school.pesce||0))total-=20;
+ for(const [group,n] of Object.entries(counts))if(group!=="legumi"&&n>2)total-=30*(n-2);
+ if((counts.uova||0)+(school.uova||0)>2)total-=15*((counts.uova||0)+(school.uova||0)-2);
+ for(const n of Object.values(families))if(n>2)total-=15*(n-2);
  return total;
 }
 function monday(offset){const d=new Date(),dow=d.getDay();d.setDate(d.getDate()+(dow===0?-6:1-dow)+7*offset);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-")}
@@ -172,8 +192,8 @@ function suggest(){
   if(!changed)break;
  }
 }
-async function loadWeek(){const offset=Number($("weekSelect").value);week=monday(offset);$("status").textContent="Caricamento dei pranzi scolastici reali…";$("days").replaceChildren();$("shopping").replaceChildren();try{const response=await fetch(WORKER+"/weekly-plan?sourceId=c10&week="+encodeURIComponent(week),{cache:"no-store"});if(!response.ok)throw Error("Dati non disponibili");const data=await response.json();if(!data.ok||!Array.isArray(data.plan?.days))throw Error("Piano settimanale non disponibile");plan=data.plan;const key="menu-c10-v2-choices-r3-"+week;let saved=null;try{saved=JSON.parse(localStorage.getItem(key)||"null")}catch{}if(saved?.diet===p.diet&&saved?.people===p.people&&saved?.chosen){chosen=saved.chosen;rejected=saved.rejected||{}}else suggest();rememberWeek();$("status").textContent="Pranzi scolastici dal piano pubblicato · cene personalizzate in prova";draw()}catch(e){plan=null;$("status").textContent="Il piano scolastico per questa settimana non è disponibile. Riprova più tardi: non mostriamo pranzi inventati."}}
-function persist(){rememberWeek();localStorage.setItem("menu-c10-v2-choices-r3-"+week,JSON.stringify({diet:p.diet,people:p.people,chosen,rejected}))}
+async function loadWeek(){const offset=Number($("weekSelect").value);week=monday(offset);$("status").textContent="Caricamento dei pranzi scolastici reali…";$("days").replaceChildren();$("shopping").replaceChildren();try{const response=await fetch(WORKER+"/weekly-plan?sourceId=c10&week="+encodeURIComponent(week),{cache:"no-store"});if(!response.ok)throw Error("Dati non disponibili");const data=await response.json();if(!data.ok||!Array.isArray(data.plan?.days))throw Error("Piano settimanale non disponibile");plan=data.plan;const key="menu-c10-v2-choices-r4-"+week;let saved=null;try{saved=JSON.parse(localStorage.getItem(key)||"null")}catch{}if(saved?.diet===p.diet&&saved?.people===p.people&&saved?.chosen){chosen=saved.chosen;rejected=saved.rejected||{}}else suggest();rememberWeek();$("status").textContent="Pranzi scolastici dal piano pubblicato · cene personalizzate in prova";draw()}catch(e){plan=null;$("status").textContent="Il piano scolastico per questa settimana non è disponibile. Riprova più tardi: non mostriamo pranzi inventati."}}
+function persist(){rememberWeek();localStorage.setItem("menu-c10-v2-choices-r4-"+week,JSON.stringify({diet:p.diet,people:p.people,chosen,rejected}))}
 function adaptations(r){const out=[];for(const [n] of r.items){const x=norm(n);if(p.celiac&&["pasta","piadine","pangrattato","cous cous","orzo"].includes(x))out.push(n+": utilizzare un prodotto idoneo per celiaci senza glutine");if(p.lactose&&x==="ricotta")out.push(n+": usare una ricotta senza lattosio idonea");if(p.milk&&x==="ricotta")out.push(n+": usare un'alternativa senza proteine del latte verificata")}return out}
 function draw(){if(!plan)return;$("days").replaceChildren();plan.days.forEach((day,i)=>{const r=R.find(x=>x.id===chosen[i]);const card=document.createElement("div");card.className="day";const h=document.createElement("h3");h.textContent=day.date||"Giorno "+(i+1);card.append(h);const lunch=document.createElement("div");lunch.className="muted";lunch.textContent="🏫 Pranzo: "+((day.lunch?.dishes||[]).join(" · ")||"Non disponibile");card.append(lunch);if(!r){card.append("Nessuna cena disponibile per il profilo selezionato.");$("days").append(card);return}const title=document.createElement("div");title.className="dish";title.textContent=r.name;card.append(title);const meta=document.createElement("span");meta.className="pill";meta.textContent="⏱ "+r.minutes+" min · "+r.protein;card.append(meta);const controls=document.createElement("div");controls.className="row";controls.style.marginTop="12px";const change=document.createElement("button");change.className="primary";change.textContent="🔄 Cambia cena";change.onclick=()=>{(rejected[i]??=[]).push(r.id);const alternative=next(i);if(!alternative){rejected[i].pop();alert("Non ci sono altre proposte nel ricettario attuale.");return}chosen[i]=alternative.id;persist();draw()};const view=document.createElement("button");view.textContent=opened[i]?"Chiudi ricetta":"📖 Vedi ricetta";view.onclick=()=>{opened[i]=!opened[i];draw()};controls.append(change,view);card.append(controls);if(opened[i]){const detail=document.createElement("div"),sub=document.createElement("h4");sub.textContent="Ingredienti per "+p.people+" persone";detail.append(sub);const ul=document.createElement("ul");for(const [n,q,u] of r.items){const li=document.createElement("li");li.textContent=n+": "+Number((q*p.people/4).toFixed(1))+" "+u;ul.append(li)}detail.append(ul);const prep=document.createElement("h4");prep.textContent="Preparazione";detail.append(prep);const ol=document.createElement("ol");for(const step of r.steps){const li=document.createElement("li");li.textContent=step;ol.append(li)}detail.append(ol);const tips=adaptations(r);if(tips.length){const p1=document.createElement("p");p1.className="note";p1.textContent="🔄 Sostituzioni: "+tips.join("; ");detail.append(p1)}if(p.celiac||p.lactose||p.milk){const warning=document.createElement("p");warning.className="warn";warning.textContent="Compatibilità medica non verificata: controllare tutti gli ingredienti, le etichette e la preparazione. Le sostituzioni sono indicative.";detail.append(warning)}card.append(detail)}$("days").append(card)});shopping()}
 function shopping(){const totals=new Map();for(const id of Object.values(chosen)){const r=R.find(x=>x.id===id);if(!r)continue;for(const [name,qty,unit] of r.items){const k=name+"|"+unit;totals.set(k,(totals.get(k)||0)+qty*p.people/4)}}$("shopping").replaceChildren();if(!totals.size)return;const ul=document.createElement("ul");for(const [k,qty] of [...totals].sort((a,b)=>a[0].localeCompare(b[0],"it"))){const [name,unit]=k.split("|");const li=document.createElement("li"),label=document.createElement("label"),cb=document.createElement("input");cb.type="checkbox";label.append(cb," "+name+" — "+Number(qty.toFixed(1))+" "+unit);li.append(label);ul.append(li)}$("shopping").append(ul)}
